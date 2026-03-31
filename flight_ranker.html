@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlightRank — מדד טיסות חכם</title>
+<meta name="description" content="דרג טיסות לפי מה שחשוב לך — איכות, מחיר וזמן טיסה. מזהה אוטומטית טיסות חריגות ומציאות.">
+
+<!-- Open Graph (WhatsApp, Telegram, LinkedIn) -->
+<meta property="og:title" content="FlightRank — מדד טיסות חכם">
+<meta property="og:description" content="שקלל בעצמך איכות, מחיר וזמן טיסה. מזהה מציאות חריגות אוטומטית.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+
+<!-- Twitter/X -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FlightRank — מדד טיסות חכם">
+<meta name="twitter:description" content="שקלל בעצמך איכות, מחיר וזמן טיסה. מזהה מציאות חריגות אוטומטית.">
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0b0e;
+    --surface: #13151a;
+    --surface2: #1c1f27;
+    --surface3: #252932;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.12);
+    --text: #f0f2f7;
+    --text2: #8b92a5;
+    --text3: #555e72;
+    --accent: #4f7cff;
+    --accent2: #7c5cfc;
+    --green: #22d3a5;
+    --amber: #f5a623;
+    --red: #ff5757;
+    --purple: #a78bfa;
+    --cyan: #22d3ee;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Heebo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* HEADER */
+  header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(10,11,14,0.92);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(34,211,165,0.1);
+    border: 1px solid rgba(34,211,165,0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--green);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* MAIN LAYOUT */
+  .app-layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    min-height: calc(100vh - 73px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    border-left: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(100vh - 73px);
+    position: sticky;
+    top: 73px;
+  }
+
+  .sidebar-section {
+    margin-bottom: 28px;
+  }
+
+  .sidebar-section h3 {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* WEIGHT SLIDERS */
+  .weight-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .weight-label {
+    font-size: 13px;
+    color: var(--text2);
+    width: 85px;
+    flex-shrink: 0;
+  }
+
+  .weight-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--surface3);
+    outline: none;
+    cursor: pointer;
+  }
+
+  .weight-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 0 3px rgba(79,124,255,0.2);
+    transition: box-shadow 0.15s;
+  }
+
+  .weight-slider::-webkit-slider-thumb:hover {
+    box-shadow: 0 0 0 5px rgba(79,124,255,0.3);
+  }
+
+  .weight-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    width: 30px;
+    text-align: left;
+  }
+
+  /* FILTERS */
+  .filter-group {
+    margin-bottom: 14px;
+  }
+
+  .filter-label {
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  .filter-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'Heebo', sans-serif;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .filter-input:focus {
+    border-color: var(--accent);
+  }
+
+  .filter-input option {
+    background: var(--surface2);
+  }
+
+  /* ANOMALY SETTINGS */
+  .anomaly-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+  }
+
+  .toggle-switch {
+    width: 36px;
+    height: 20px;
+    background: var(--surface3);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .toggle-switch.on {
+    background: var(--green);
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.2s;
+  }
+
+  .toggle-switch.on::after {
+    transform: translateX(16px);
+  }
+
+  /* ACTION BUTTON */
+  .search-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'Heebo', sans-serif;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+
+  .search-btn:hover { opacity: 0.9; }
+  .search-btn:active { transform: scale(0.98); }
+
+  .search-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* MAIN CONTENT */
+  .main-content {
+    padding: 28px 32px;
+    overflow-y: auto;
+  }
+
+  /* TOP BAR */
+  .content-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .results-count {
+    font-size: 13px;
+    color: var(--text3);
+  }
+
+  .sort-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 4px;
+  }
+
+  .sort-tab {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--text2);
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    font-family: 'Heebo', sans-serif;
+  }
+
+  .sort-tab.active {
+    background: var(--surface3);
+    color: var(--text);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .stat-card .s-label {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .stat-card .s-val {
+    font-size: 22px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ANOMALY BANNER */
+  .anomaly-banner {
+    background: rgba(245,166,35,0.08);
+    border: 1px solid rgba(245,166,35,0.2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .anomaly-banner.visible {
+    display: flex;
+  }
+
+  .anomaly-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .anomaly-text {
+    font-size: 13px;
+    color: var(--amber);
+  }
+
+  /* FLIGHT CARDS */
+  .flight-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: grid;
+    grid-template-columns: 50px 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flight-card:hover {
+    border-color: var(--border2);
+    background: var(--surface2);
+  }
+
+  .flight-card.anomaly {
+    border-color: rgba(245,166,35,0.3);
+  }
+
+  .flight-card.anomaly::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--amber);
+  }
+
+  .flight-card.top-ranked {
+    border-color: rgba(79,124,255,0.3);
+  }
+
+  .flight-card.top-ranked::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+  }
+
+  /* RANK BADGE */
+  .rank-badge {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text3);
+    text-align: center;
+  }
+
+  .rank-badge.gold { color: #fbbf24; }
+  .rank-badge.silver { color: #94a3b8; }
+  .rank-badge.bronze { color: #b87333; }
+
+  /* FLIGHT INFO */
+  .flight-main .route {
+    font-size: 17px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+
+  .flight-main .route .arrow {
+    color: var(--text3);
+    margin: 0 6px;
+    font-size: 14px;
+  }
+
+  .flight-main .meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--text2);
+  }
+
+  .meta-tag {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .airline-badge {
+    padding: 2px 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--text2);
+    border: 1px solid var(--border);
+  }
+
+  /* SCORE BARS */
+  .score-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+  }
+
+  .score-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+  }
+
+  .score-bar-label {
+    width: 40px;
+    color: var(--text3);
+    text-align: right;
+    font-size: 10px;
+  }
+
+  .score-bar-track {
+    flex: 1;
+    height: 3px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .fill-quality { background: var(--purple); }
+  .fill-price { background: var(--green); }
+  .fill-time { background: var(--cyan); }
+
+  .score-bar-val {
+    width: 28px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text2);
+    text-align: left;
+  }
+
+  /* TOTAL SCORE */
+  .total-score {
+    text-align: center;
+    min-width: 70px;
+  }
+
+  .total-score .score-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .total-score .score-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ANOMALY INDICATOR */
+  .anomaly-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+  }
+
+  .anomaly-chip {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .anomaly-chip.high {
+    background: rgba(255,87,87,0.15);
+    color: var(--red);
+    border: 1px solid rgba(255,87,87,0.2);
+  }
+
+  .anomaly-chip.medium {
+    background: rgba(245,166,35,0.15);
+    color: var(--amber);
+    border: 1px solid rgba(245,166,35,0.2);
+  }
+
+  .anomaly-chip.low {
+    background: rgba(34,211,165,0.1);
+    color: var(--green);
+    border: 1px solid rgba(34,211,165,0.15);
+  }
+
+  .anomaly-chip.normal {
+    background: var(--surface2);
+    color: var(--text3);
+    border: 1px solid var(--border);
+  }
+
+  /* LOADING */
+  .loading-state {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 0;
+    gap: 16px;
+  }
+
+  .loading-state.visible {
+    display: flex;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--surface3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .loading-text {
+    font-size: 13px;
+    color: var(--text3);
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 0;
+    gap: 12px;
+  }
+
+  .empty-icon {
+    font-size: 48px;
+    opacity: 0.3;
+  }
+
+  .empty-text {
+    font-size: 14px;
+    color: var(--text3);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.visible {
+    display: flex;
+  }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 18px;
+    padding: 28px;
+    width: 520px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+  }
+
+  .modal h2 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .modal-route {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .modal-section {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .modal-section h4 {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .detail-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 12px;
+  }
+
+  .detail-item .d-label {
+    font-size: 11px;
+    color: var(--text3);
+    margin-bottom: 4px;
+  }
+
+  .detail-item .d-val {
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .analysis-text {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  /* SCORE COLORS */
+  .score-excellent { color: var(--green); }
+  .score-good { color: var(--cyan); }
+  .score-medium { color: var(--amber); }
+  .score-low { color: var(--red); }
+
+  /* ANOMALY SCORE BARS */
+  .anomaly-bars {
+    margin-top: 12px;
+  }
+
+  .anomaly-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+
+  .anomaly-bar-label {
+    width: 100px;
+    color: var(--text2);
+    text-align: right;
+  }
+
+  .anomaly-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--surface3);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .anomaly-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+  }
+
+  .anomaly-bar-sigma {
+    width: 40px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-align: left;
+  }
+
+  /* FLIGHTS TABLE — 2-row block per flight */
+  .flights-table {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .flight-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border-right: 3px solid transparent;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .flight-block:hover { border-color: var(--border2); background: var(--surface2); }
+  .flight-block:hover .fb-bottom { background: rgba(255,255,255,0.01); }
+  .flight-block.rank-1 { border-right-color: #fbbf24; }
+  .flight-block.rank-2 { border-right-color: #94a3b8; }
+  .flight-block.rank-3 { border-right-color: #b87333; }
+  .flight-block.is-deal { border-right-color: var(--amber); background: rgba(245,166,35,0.03); }
+
+  /* Row 1: flight identity */
+  .fb-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px 10px;
+  }
+
+  .fb-rank {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    min-width: 34px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .fb-iata {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .fb-iata .arr { color: var(--text3); margin: 0 5px; font-size: 13px; }
+
+  .fb-cities {
+    font-size: 11px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  .fb-divider { color: var(--text3); font-size: 12px; }
+
+  .fb-airline-badge {
+    padding: 2px 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    font-size: 11px;
+    color: var(--text2);
+    border: 1px solid var(--border);
+    font-family: 'Space Mono', monospace;
+    white-space: nowrap;
+  }
+
+  .fb-airline { font-size: 13px; color: var(--text2); white-space: nowrap; }
+
+  .fb-meta {
+    font-size: 11px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  .fb-spacer { flex: 1; }
+
+  .deal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 8px;
+    background: rgba(245,166,35,0.15);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 5px;
+    font-size: 11px;
+    font-family: 'Space Mono', monospace;
+    color: var(--amber);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* Metrics: 2-row table (header row + values row) */
+  .fb-table {
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.15);
+  }
+
+  .fb-thead, .fb-tbody {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .fb-thead {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .fb-th {
+    padding: 5px 16px;
+    font-size: 9px;
+    color: var(--text3);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    border-left: 1px solid var(--border);
+  }
+  .fb-th:last-child { border-left: none; }
+
+  .fb-td {
+    padding: 10px 16px;
+    border-left: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .fb-td:last-child { border-left: none; }
+
+  .fb-td .td-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .fb-td .td-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .fb-td .td-bar-track {
+    height: 3px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .fb-td .td-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+  .fb-td .td-sub {
+    font-size: 10px;
+    color: var(--text3);
+    white-space: nowrap;
+  }
+
+  .score-pill {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 52px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-align: center;
+    align-self: flex-start;
+  }
+  .score-pill .sp-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .score-pill .sp-label {
+    font-size: 9px;
+    opacity: 0.6;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-family: 'Space Mono', monospace;
+    margin-top: 2px;
+  }
+  .score-pill.excellent { background: rgba(34,211,165,0.12); color: var(--green); border: 1px solid rgba(34,211,165,0.2); }
+  .score-pill.good      { background: rgba(34,211,238,0.12); color: var(--cyan);  border: 1px solid rgba(34,211,238,0.2); }
+  .score-pill.medium    { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
+  .score-pill.low       { background: rgba(255,87,87,0.12);  color: var(--red);   border: 1px solid rgba(255,87,87,0.2); }
+
+  /* Stat card clickable/active for deal filter */
+  .stat-card.clickable { cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+  .stat-card.clickable:hover { border-color: var(--border2); background: var(--surface2); }
+  .stat-card.filter-active {
+    border-color: rgba(245,166,35,0.4) !important;
+    background: rgba(245,166,35,0.06) !important;
+  }
+  .stat-card .s-filter-hint {
+    font-size: 9px;
+    color: var(--text3);
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+  .stat-card.filter-active .s-filter-hint { color: var(--amber); }
+
+  /* SIDEBAR TOGGLE BUTTON */
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .sidebar-toggle:hover { background: var(--surface3); color: var(--text); }
+
+  /* DESKTOP: sidebar collapses in place */
+  .app-layout.sidebar-hidden {
+    grid-template-columns: 0 1fr;
+  }
+  .app-layout.sidebar-hidden .sidebar {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    border-left: none;
+  }
+
+  /* MOBILE OVERLAY */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 150;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.visible { display: block; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .app-layout {
+      grid-template-columns: 1fr !important;
+    }
+    .sidebar {
+      position: fixed !important;
+      top: 0;
+      right: -320px;
+      width: 300px !important;
+      height: 100vh;
+      max-height: 100vh;
+      z-index: 160;
+      background: var(--surface);
+      border-left: 1px solid var(--border2);
+      transition: right 0.25s ease;
+      padding-top: 72px;
+    }
+    .sidebar.mobile-open {
+      right: 0;
+    }
+    .main-content { padding: 16px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .fb-top { flex-wrap: wrap; gap: 6px; padding: 10px 12px 8px; }
+    .fb-thead, .fb-tbody { grid-template-columns: repeat(2, 1fr); }
+    .fb-th:nth-child(3), .fb-th:nth-child(4),
+    .fb-td:nth-child(3), .fb-td:nth-child(4) { display: none; }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .app-layout { grid-template-columns: 260px 1fr; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .sidebar { transition: width 0.25s ease, padding 0.25s ease; }
+  }
+
+  @media (min-width: 769px) {
+    .sidebar { transition: width 0.25s ease, padding 0.25s ease; overflow: hidden; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="פתח/סגור תפריט">☰</button>
+    <div class="logo-icon">✈</div>
+    <div>
+      <div class="logo-text">FlightRank</div>
+      <div class="logo-sub">מדד טיסות חכם</div>
+    </div>
+  </div>
+  <div class="status-badge">
+    <div class="status-dot"></div>
+    <span id="api-status">מחפש נתונים...</span>
+  </div>
+</header>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section">
+      <h3>⚖ משקל קריטריונים</h3>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">שנה את המשקל כדי להתאים לסגנונך</div>
+
+      <div class="weight-row">
+        <span class="weight-label">איכות חברה</span>
+        <input type="range" class="weight-slider" id="w-quality" min="0" max="100" value="40">
+        <span class="weight-val" id="wv-quality">40%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-label">מחיר</span>
+        <input type="range" class="weight-slider" id="w-price" min="0" max="100" value="35">
+        <span class="weight-val" id="wv-price">35%</span>
+      </div>
+      <div class="weight-row">
+        <span class="weight-label">זמן טיסה</span>
+        <input type="range" class="weight-slider" id="w-time" min="0" max="100" value="25">
+        <span class="weight-val" id="wv-time">25%</span>
+      </div>
+
+      <div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);">
+        סה"כ: <span id="weight-total" style="color:var(--amber);font-family:'Space Mono',monospace;">100%</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>🔍 סינון</h3>
+      <div class="filter-group">
+        <label class="filter-label">נקודת מוצא</label>
+        <select class="filter-input" id="f-origin">
+          <option value="">כל הנקודות</option>
+          <option value="TLV">תל אביב (TLV)</option>
+          <option value="ETM">אילת (ETM)</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">יעד</label>
+        <select class="filter-input" id="f-dest">
+          <option value="">כל היעדים</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">חברת תעופה</label>
+        <select class="filter-input" id="f-airline">
+          <option value="">כל החברות</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">עצירות מקסימאלי</label>
+        <select class="filter-input" id="f-stops">
+          <option value="-1">כל הטיסות</option>
+          <option value="0">ישיר בלבד</option>
+          <option value="1">עד עצירה אחת</option>
+          <option value="2">עד שתי עצירות</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">מחיר מקסימאלי ($)</label>
+        <input type="number" class="filter-input" id="f-maxprice" placeholder="ללא הגבלה" min="0">
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>⚡ זיהוי חריגויות</h3>
+      <div class="anomaly-toggle" onclick="toggleAnomaly()">
+        <span style="font-size:13px;color:var(--text2);">הצג חריגויות</span>
+        <div class="toggle-switch on" id="anomaly-toggle"></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.6;">
+        מזהה טיסות שסוטות מהנורמה ביחס לקריטריונים — מציאות חד-פעמיות או בעיות מוסתרות
+      </div>
+    </div>
+
+    <button class="search-btn" onclick="searchFlights()" id="search-btn">
+      🔍 חפש ודרג טיסות
+    </button>
+
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <div class="content-topbar">
+      <div class="results-count" id="results-count">טוען נתונים...</div>
+      <div class="sort-tabs">
+        <button class="sort-tab active" onclick="setSortMode('score')" id="tab-score">ציון</button>
+        <button class="sort-tab" onclick="setSortMode('price')" id="tab-price">מחיר</button>
+        <button class="sort-tab" onclick="setSortMode('time')" id="tab-time">זמן</button>
+        <button class="sort-tab" onclick="setSortMode('anomaly')" id="tab-anomaly">חריגות</button>
+      </div>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="s-label">טיסות נמצאו</div>
+        <div class="s-val" id="stat-count" style="color:var(--accent)">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">ממוצע מחיר</div>
+        <div class="s-val" id="stat-avgprice" style="color:var(--green)">—</div>
+      </div>
+      <div class="stat-card clickable" id="deal-filter-card" onclick="toggleDealFilter()" title="לחץ לסנן רק טיסות חריגות">
+        <div class="s-label">🔥 טיסות חריגות</div>
+        <div class="s-val" id="stat-anomalies" style="color:var(--amber)">—</div>
+        <div class="s-filter-hint" id="deal-filter-hint">לחץ לסינון</div>
+      </div>
+      <div class="stat-card">
+        <div class="s-label">ציון ממוצע</div>
+        <div class="s-val" id="stat-avgscore" style="color:var(--purple)">—</div>
+      </div>
+    </div>
+
+    <div class="anomaly-banner" id="anomaly-banner">
+      <div class="anomaly-icon">⚠</div>
+      <div class="anomaly-text" id="anomaly-text"></div>
+    </div>
+
+    <div class="loading-state visible" id="loading-state">
+      <div class="spinner"></div>
+      <div class="loading-text">טוען טיסות בזמן אמת...</div>
+    </div>
+
+    <div id="flights-container">
+      <div class="flights-grid" id="flights-grid"></div>
+      <div class="empty-state" id="empty-state" style="display:none;">
+        <div class="empty-icon">✈</div>
+        <div class="empty-text">לא נמצאו טיסות התואמות לחיפוש שלך</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+const AIRLINES_DATA = {"QR":{"name":"Qatar Airways","quality_score":10,"is_low_cost":false},"SQ":{"name":"Singapore Airlines","quality_score":9.8,"is_low_cost":false},"EK":{"name":"Emirates","quality_score":9.6,"is_low_cost":false},"NH":{"name":"ANA All Nippon Airways","quality_score":9.5,"is_low_cost":false},"CX":{"name":"Cathay Pacific","quality_score":9.4,"is_low_cost":false},"JL":{"name":"Japan Airlines","quality_score":9.3,"is_low_cost":false},"TK":{"name":"Turkish Airlines","quality_score":9,"is_low_cost":false},"BR":{"name":"EVA Air","quality_score":8.9,"is_low_cost":false},"AF":{"name":"Air France","quality_score":8.8,"is_low_cost":false},"LX":{"name":"Swiss International Air Lines","quality_score":8.7,"is_low_cost":false},"LY":{"name":"El Al","quality_score":7,"is_low_cost":false},"EK":{"name":"Emirates","quality_score":9.6,"is_low_cost":false},"U2":{"name":"EasyJet","quality_score":6.5,"is_low_cost":true},"FR":{"name":"Ryanair","quality_score":4.5,"is_low_cost":true},"W6":{"name":"Wizz Air","quality_score":4.5,"is_low_cost":true},"IZ":{"name":"Arkia","quality_score":6,"is_low_cost":true},"6H":{"name":"Israir","quality_score":5.8,"is_low_cost":true},"KE":{"name":"Korean Air","quality_score":8.6,"is_low_cost":false},"BA":{"name":"British Airways","quality_score":8.4,"is_low_cost":false},"DL":{"name":"Delta Air Lines","quality_score":8.3,"is_low_cost":false},"LH":{"name":"Lufthansa","quality_score":8.2,"is_low_cost":false},"KL":{"name":"KLM Royal Dutch Airlines","quality_score":8.1,"is_low_cost":false},"EY":{"name":"Etihad Airways","quality_score":8.1,"is_low_cost":false}};
+
+const AIRPORTS = {"TLV":{"name":"Ben Gurion International Airport","latitude":32.011398,"longitude":34.8867,"country":"IL","city":"Tel Aviv"},"ETM":{"name":"Ramon International Airport","latitude":29.727009,"longitude":35.014116,"country":"IL","city":"Eilat"},"LHR":{"name":"London Heathrow","latitude":51.470748,"longitude":-0.459909,"country":"GB","city":"London"},"CDG":{"name":"Charles de Gaulle","latitude":49.00896,"longitude":2.554117,"country":"FR","city":"Paris"},"JFK":{"name":"John F. Kennedy","latitude":40.639447,"longitude":-73.779317,"country":"US","city":"New York"},"DXB":{"name":"Dubai International","latitude":25.24979,"longitude":55.370992,"country":"AE","city":"Dubai"},"DOH":{"name":"Hamad International","latitude":25.273056,"longitude":51.608056,"country":"QA","city":"Doha"},"FRA":{"name":"Frankfurt Main","latitude":50.026706,"longitude":8.55835,"country":"DE","city":"Frankfurt"},"AMS":{"name":"Amsterdam Schiphol","latitude":52.308601,"longitude":4.76389,"country":"NL","city":"Amsterdam"},"IST":{"name":"Istanbul Airport","latitude":41.274874,"longitude":28.732136,"country":"TR","city":"Istanbul"},"BKK":{"name":"Suvarnabhumi","latitude":13.6811,"longitude":100.747002,"country":"TH","city":"Bangkok"},"NRT":{"name":"Narita International","latitude":35.76858,"longitude":140.388714,"country":"JP","city":"Tokyo"},"SIN":{"name":"Singapore Changi","latitude":1.35019,"longitude":103.994003,"country":"SG","city":"Singapore"},"FCO":{"name":"Rome Fiumicino","latitude":41.804532,"longitude":12.251998,"country":"IT","city":"Rome"},"BCN":{"name":"Barcelona El Prat","latitude":41.2971,"longitude":2.07846,"country":"ES","city":"Barcelona"},"MUC":{"name":"Munich Airport","latitude":48.353802,"longitude":11.7861,"country":"DE","city":"Munich"},"MAD":{"name":"Madrid Barajas","latitude":40.493407,"longitude":-3.572249,"country":"ES","city":"Madrid"},"ZRH":{"name":"Zurich Airport","latitude":47.458056,"longitude":8.548056,"country":"CH","city":"Zurich"},"VIE":{"name":"Vienna International","latitude":48.110298,"longitude":16.5697,"country":"AT","city":"Vienna"},"ATH":{"name":"Athens Eleftherios Venizelos","latitude":37.936401,"longitude":23.9445,"country":"GR","city":"Athens"},"LAX":{"name":"Los Angeles International","latitude":33.942501,"longitude":-118.407997,"country":"US","city":"Los Angeles"},"ORD":{"name":"Chicago O'Hare","latitude":41.9786,"longitude":-87.9048,"country":"US","city":"Chicago"},"BOS":{"name":"Boston Logan","latitude":42.36197,"longitude":-71.0079,"country":"US","city":"Boston"},"EWR":{"name":"Newark Liberty","latitude":40.6894,"longitude":-74.170545,"country":"US","city":"New York"},"MIA":{"name":"Miami International","latitude":25.796011,"longitude":-80.289751,"country":"US","city":"Miami"},"HKG":{"name":"Hong Kong International","latitude":22.31184,"longitude":113.914862,"country":"HK","city":"Hong Kong"},"SYD":{"name":"Sydney Kingsford Smith","latitude":-33.946098,"longitude":151.177002,"country":"AU","city":"Sydney"},"GRU":{"name":"São Paulo Guarulhos","latitude":-23.431274,"longitude":-46.469954,"country":"BR","city":"São Paulo"}};
+
+let allFlights = [];
+
+function toggleSidebar() {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('visible', isOpen);
+  } else {
+    document.querySelector('.app-layout').classList.toggle('sidebar-hidden');
+  }
+}
+let filteredFlights = [];
+let sortMode = 'score';
+let showAnomalies = true;
+let filterDeals = false;
+let statsData = {};
+
+function toggleDealFilter() {
+  filterDeals = !filterDeals;
+  const card = document.getElementById('deal-filter-card');
+  const hint = document.getElementById('deal-filter-hint');
+  card.classList.toggle('filter-active', filterDeals);
+  hint.textContent = filterDeals ? '✕ בטל סינון' : 'לחץ לסינון';
+  if (allFlights.length > 0) rerankAndDisplay();
+}
+
+function getWeights() {
+  const q = +document.getElementById('w-quality').value;
+  const p = +document.getElementById('w-price').value;
+  const t = +document.getElementById('w-time').value;
+  return { quality: q/100, price: p/100, time: t/100, total: q+p+t };
+}
+
+function updateWeightDisplay() {
+  ['quality','price','time'].forEach(k => {
+    document.getElementById('wv-'+k).textContent = document.getElementById('w-'+k).value + '%';
+  });
+  const total = +document.getElementById('w-quality').value + +document.getElementById('w-price').value + +document.getElementById('w-time').value;
+  const el = document.getElementById('weight-total');
+  el.textContent = total + '%';
+  el.style.color = total === 100 ? 'var(--green)' : 'var(--amber)';
+}
+
+// Constrained sliders: always sum to 100%
+const SLIDER_IDS = ['w-quality', 'w-price', 'w-time'];
+const SLIDER_MIN = 5;
+
+SLIDER_IDS.forEach(changedId => {
+  document.getElementById(changedId).addEventListener('input', function() {
+    const maxVal = 100 - SLIDER_MIN * 2;
+    let newVal = Math.max(SLIDER_MIN, Math.min(maxVal, +this.value));
+    this.value = newVal;
+
+    const remaining = 100 - newVal;
+    const otherIds = SLIDER_IDS.filter(id => id !== changedId);
+    const otherEls = otherIds.map(id => document.getElementById(id));
+    const otherSum = otherEls.reduce((s, el) => s + +el.value, 0);
+
+    // Distribute remaining proportionally
+    let newVals = otherEls.map(el =>
+      Math.max(SLIDER_MIN, otherSum > 0
+        ? Math.round(remaining * (+el.value / otherSum))
+        : Math.floor(remaining / 2))
+    );
+
+    // Fix rounding drift so total === 100
+    let diff = 100 - newVal - newVals.reduce((s, v) => s + v, 0);
+    for (let i = 0; i < newVals.length && diff !== 0; i++) {
+      if (diff > 0) { newVals[i]++; diff--; }
+      else if (newVals[i] > SLIDER_MIN) { newVals[i]--; diff++; }
+    }
+
+    otherEls.forEach((el, i) => { el.value = newVals[i]; });
+    updateWeightDisplay();
+    if (allFlights.length > 0) rerankAndDisplay();
+  });
+});
+
+function toggleAnomaly() {
+  showAnomalies = !showAnomalies;
+  const t = document.getElementById('anomaly-toggle');
+  t.classList.toggle('on', showAnomalies);
+  if (allFlights.length > 0) rerankAndDisplay();
+}
+
+function setSortMode(mode) {
+  sortMode = mode;
+  ['score','price','time','anomaly'].forEach(m => {
+    document.getElementById('tab-'+m)?.classList.toggle('active', m===mode);
+  });
+  if (allFlights.length > 0) rerankAndDisplay();
+}
+
+function generateMockFlights() {
+  const routes = [
+    {from:'TLV',to:'LHR',airlines:['LY','BA','EK'],stops:[0,1],prices:[320,450,890,230,670]},
+    {from:'TLV',to:'CDG',airlines:['LY','AF','TK'],stops:[0,0,1],prices:[280,350,520,190,440]},
+    {from:'TLV',to:'JFK',airlines:['LY','EK','EY'],stops:[0,1,1],prices:[650,890,1100,540,750]},
+    {from:'TLV',to:'DXB',airlines:['EK','LY','FZ'],stops:[0,0,1],prices:[350,420,180,560,290]},
+    {from:'TLV',to:'DOH',airlines:['QR','LY'],stops:[0,0],prices:[380,290,470]},
+    {from:'TLV',to:'FRA',airlines:['LH','LY','W6'],stops:[0,0,1],prices:[220,310,85,400]},
+    {from:'TLV',to:'AMS',airlines:['KL','LY'],stops:[0,0],prices:[260,380,199]},
+    {from:'TLV',to:'IST',airlines:['TK','LY','W6'],stops:[0,0,0],prices:[120,180,65,240]},
+    {from:'TLV',to:'BKK',airlines:['EK','QR','TK'],stops:[1,1,1],prices:[580,720,620]},
+    {from:'TLV',to:'NRT',airlines:['EK','QR','SQ'],stops:[1,1,1],prices:[980,850,920]},
+    {from:'TLV',to:'SIN',airlines:['SQ','EK'],stops:[1,1],prices:[820,750]},
+    {from:'TLV',to:'FCO',airlines:['LY','ITA','FR'],stops:[0,0,1],prices:[195,260,75,320]},
+    {from:'TLV',to:'BCN',airlines:['LY','VY','U2'],stops:[0,1,1],prices:[210,145,310,95]},
+    {from:'TLV',to:'MUC',airlines:['LH','LY'],stops:[0,0],prices:[245,310,190]},
+    {from:'TLV',to:'ATH',airlines:['A3','LY','FR'],stops:[0,0,0],prices:[145,195,79,260]},
+    {from:'TLV',to:'LAX',airlines:['EK','LY'],stops:[1,1],prices:[880,1100,760]},
+    {from:'TLV',to:'ZRH',airlines:['LX','LY'],stops:[0,0],prices:[285,340]},
+  ];
+
+  const flights = [];
+  let id = 1;
+
+  routes.forEach(route => {
+    const from = AIRPORTS[route.from];
+    const to = AIRPORTS[route.to];
+    if (!from || !to) return;
+
+    const baseDuration = calcBaseDuration(route.from, route.to);
+
+    route.airlines.forEach((airlineCode, ai) => {
+      const airline = AIRLINES_DATA[airlineCode] || {name: airlineCode, quality_score: 7, is_low_cost: false};
+      const stops = route.stops[ai % route.stops.length];
+      const basePrice = route.prices[Math.floor(Math.random() * route.prices.length)];
+      const priceVariation = 0.85 + Math.random() * 0.3;
+      const price = Math.round(basePrice * priceVariation);
+
+      const stopPenalty = stops * (0.15 + Math.random() * 0.25);
+      const duration = Math.round(baseDuration * (1 + stopPenalty + (Math.random() * 0.1 - 0.05)));
+
+      flights.push({
+        id: id++,
+        from: route.from,
+        to: route.to,
+        fromCity: from.city,
+        toCity: to.city,
+        airlineCode,
+        airlineName: airline.name,
+        qualityScore: airline.quality_score,
+        isLowCost: airline.is_low_cost,
+        stops,
+        price,
+        duration,
+        departureHour: Math.floor(Math.random() * 20) + 4,
+      });
+    });
+  });
+
+  return flights;
+}
+
+function calcBaseDuration(from, to) {
+  const DURATIONS = {
+    'TLV-LHR': 270, 'TLV-CDG': 255, 'TLV-JFK': 660, 'TLV-DXB': 210,
+    'TLV-DOH': 195, 'TLV-FRA': 240, 'TLV-AMS': 255, 'TLV-IST': 155,
+    'TLV-BKK': 620, 'TLV-NRT': 720, 'TLV-SIN': 620, 'TLV-FCO': 215,
+    'TLV-BCN': 260, 'TLV-MUC': 240, 'TLV-ATH': 140, 'TLV-LAX': 780,
+    'TLV-ZRH': 240,
+  };
+  return DURATIONS[`${from}-${to}`] || 300;
+}
+
+function computeScores(flights) {
+  const w = getWeights();
+
+  const prices = flights.map(f => f.price);
+  const durations = flights.map(f => f.duration);
+  const qualities = flights.map(f => f.qualityScore);
+
+  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const minD = Math.min(...durations), maxD = Math.max(...durations);
+  const minQ = Math.min(...qualities), maxQ = Math.max(...qualities);
+
+  const avgP = prices.reduce((a,b)=>a+b,0)/prices.length;
+  const avgD = durations.reduce((a,b)=>a+b,0)/durations.length;
+  const avgQ = qualities.reduce((a,b)=>a+b,0)/qualities.length;
+
+  const stdP = Math.sqrt(prices.map(p=>(p-avgP)**2).reduce((a,b)=>a+b,0)/prices.length);
+  const stdD = Math.sqrt(durations.map(d=>(d-avgD)**2).reduce((a,b)=>a+b,0)/durations.length);
+  const stdQ = Math.sqrt(qualities.map(q=>(q-avgQ)**2).reduce((a,b)=>a+b,0)/qualities.length);
+
+  return flights.map(f => {
+    const priceScore = maxP === minP ? 0.5 : (maxP - f.price) / (maxP - minP);
+    const timeScore = maxD === minD ? 0.5 : (maxD - f.duration) / (maxD - minD);
+    const qualityScore = maxQ === minQ ? 0.5 : (f.qualityScore - minQ) / (maxQ - minQ);
+
+    const stopPenalty = f.stops * 0.08;
+    const compositeScore = (w.quality * qualityScore + w.price * priceScore + w.time * timeScore) - stopPenalty;
+    const totalScore = Math.max(0, Math.min(100, compositeScore * 100));
+
+    const zPrice = stdP > 0 ? (f.price - avgP) / stdP : 0;
+    const zDuration = stdD > 0 ? (f.duration - avgD) / stdD : 0;
+    const zQuality = stdQ > 0 ? (f.qualityScore - avgQ) / stdQ : 0;
+
+    const anomalyScore = Math.max(Math.abs(zPrice), Math.abs(zDuration), Math.abs(zQuality));
+
+    let anomalyType = 'normal';
+    let anomalyReason = '';
+
+    if (anomalyScore >= 2) {
+      anomalyType = 'high';
+      if (Math.abs(zPrice) >= 2) {
+        anomalyReason = f.price < avgP ? 'מחיר נמוך חריג — בדוק תנאים' : 'מחיר גבוה חריג';
+      } else if (Math.abs(zDuration) >= 2) {
+        anomalyReason = f.duration < avgD ? 'טיסה מהירה חריג' : 'טיסה ארוכה חריג';
+      } else {
+        anomalyReason = f.qualityScore < avgQ ? 'איכות נמוכה חריגה' : 'איכות גבוהה יוצאת דופן';
+      }
+    } else if (anomalyScore >= 1.5) {
+      anomalyType = 'medium';
+      anomalyReason = 'סטייה מהנורמה';
+    } else if (anomalyScore >= 1) {
+      anomalyType = 'low';
+    }
+
+    return {
+      ...f,
+      priceScore: Math.round(priceScore * 100),
+      timeScore: Math.round(timeScore * 100),
+      qualityScore_norm: Math.round(qualityScore * 100),
+      totalScore: Math.round(totalScore),
+      anomalyScore: Math.round(anomalyScore * 10) / 10,
+      anomalyType,
+      anomalyReason,
+      zPrice: Math.round(zPrice * 10) / 10,
+      zDuration: Math.round(zDuration * 10) / 10,
+      zQuality: Math.round(zQuality * 10) / 10,
+    };
+  });
+}
+
+function filterFlights(flights) {
+  const origin = document.getElementById('f-origin').value;
+  const dest = document.getElementById('f-dest').value;
+  const airline = document.getElementById('f-airline').value;
+  const maxStops = +document.getElementById('f-stops').value;
+  const maxPrice = +document.getElementById('f-maxprice').value || Infinity;
+
+  return flights.filter(f => {
+    if (origin && f.from !== origin) return false;
+    if (dest && f.to !== dest) return false;
+    if (airline && f.airlineCode !== airline) return false;
+    if (maxStops >= 0 && f.stops > maxStops) return false;
+    if (f.price > maxPrice) return false;
+    if (filterDeals && f.anomalyType !== 'high' && f.anomalyType !== 'medium') return false;
+    return true;
+  });
+}
+
+function sortFlights(flights) {
+  return [...flights].sort((a, b) => {
+    if (sortMode === 'score') return b.totalScore - a.totalScore;
+    if (sortMode === 'price') return a.price - b.price;
+    if (sortMode === 'time') return a.duration - b.duration;
+    if (sortMode === 'anomaly') return b.anomalyScore - a.anomalyScore;
+    return 0;
+  });
+}
+
+function formatDuration(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${h}ש ${m}ד`;
+}
+
+function getScoreClass(score) {
+  if (score >= 75) return 'score-excellent';
+  if (score >= 55) return 'score-good';
+  if (score >= 35) return 'score-medium';
+  return 'score-low';
+}
+
+function renderFlights(flights) {
+  const container = document.getElementById('flights-grid');
+  const empty = document.getElementById('empty-state');
+
+  container.innerHTML = '';
+
+  if (flights.length === 0) {
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const table = document.createElement('div');
+  table.className = 'flights-table';
+
+  flights.forEach((f, i) => {
+    const rankMark = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+    const rankColor = i === 0 ? '#fbbf24' : i === 1 ? '#94a3b8' : i === 2 ? '#b87333' : 'var(--text3)';
+    const isDeal = f.anomalyType === 'high' || f.anomalyType === 'medium';
+    const blockClass = [i < 3 ? `rank-${i+1}` : '', isDeal ? 'is-deal' : ''].join(' ').trim();
+    const sc = f.totalScore >= 75 ? 'excellent' : f.totalScore >= 55 ? 'good' : f.totalScore >= 35 ? 'medium' : 'low';
+    const dealBadge = isDeal
+      ? `<span class="deal-badge">⚡ חריגה${f.anomalyType === 'high' ? ' גבוהה' : ''}</span>`
+      : '';
+
+    const block = document.createElement('div');
+    block.className = `flight-block ${blockClass}`;
+    block.onclick = () => showFlightDetail(f, i+1);
+
+    block.innerHTML = `
+      <!-- Row 1: flight identity -->
+      <div class="fb-top">
+        <div class="fb-rank" style="font-size:${i<3?'18':'13'}px;color:${rankColor}">${rankMark}</div>
+        <span class="fb-iata">${f.from}<span class="arr">→</span>${f.to}</span>
+        <span class="fb-cities">${f.fromCity} → ${f.toCity}</span>
+        <span class="fb-divider">·</span>
+        <span class="fb-airline-badge">${f.airlineCode}</span>
+        <span class="fb-airline">${f.airlineName}</span>
+        <span class="fb-divider">·</span>
+        <span class="fb-meta">${f.stops === 0 ? 'ישיר' : f.stops + ' עצירות'} · ${formatDuration(f.duration)}</span>
+        <div class="fb-spacer"></div>
+        ${dealBadge}
+      </div>
+
+      <!-- Metrics table: row 1 = headers, row 2 = values -->
+      <div class="fb-table">
+        <div class="fb-thead">
+          <div class="fb-th">מחיר</div>
+          <div class="fb-th">איכות חברה</div>
+          <div class="fb-th">ציון חברה</div>
+          <div class="fb-th">ציון כולל</div>
+        </div>
+        <div class="fb-tbody">
+          <div class="fb-td">
+            <div class="td-val" style="color:var(--green)">$${f.price}</div>
+            <div class="td-bar-wrap">
+              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.priceScore}%;background:var(--green)"></div></div>
+              <div class="td-sub">ציון ${f.priceScore}/100</div>
+            </div>
+          </div>
+          <div class="fb-td">
+            <div class="td-val" style="color:var(--purple)">${f.qualityScore}<span style="font-size:12px;font-weight:400;opacity:0.5">/10</span></div>
+            <div class="td-bar-wrap">
+              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.qualityScore * 10}%;background:var(--purple)"></div></div>
+              <div class="td-sub">${f.airlineName}</div>
+            </div>
+          </div>
+          <div class="fb-td">
+            <div class="td-val" style="color:var(--purple)">${f.qualityScore_norm}</div>
+            <div class="td-bar-wrap">
+              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
+              <div class="td-sub">יחסי לתוצאות</div>
+            </div>
+          </div>
+          <div class="fb-td">
+            <div class="score-pill ${sc}">
+              <div class="sp-num">${f.totalScore}</div>
+              <div class="sp-label">score</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    table.appendChild(block);
+  });
+
+  container.appendChild(table);
+}
+
+function updateStats(flights) {
+  const all = flights;
+  document.getElementById('stat-count').textContent = all.length;
+
+  if (all.length > 0) {
+    const avgPrice = Math.round(all.reduce((s,f)=>s+f.price,0)/all.length);
+    document.getElementById('stat-avgprice').textContent = '$' + avgPrice;
+
+    const anomalies = all.filter(f => f.anomalyType === 'high' || f.anomalyType === 'medium');
+    document.getElementById('stat-anomalies').textContent = anomalies.length;
+
+    const avgScore = Math.round(all.reduce((s,f)=>s+f.totalScore,0)/all.length);
+    document.getElementById('stat-avgscore').textContent = avgScore;
+
+    const banner = document.getElementById('anomaly-banner');
+    if (!filterDeals && anomalies.length > 0) {
+      banner.classList.add('visible');
+      const highCount = anomalies.filter(f => f.anomalyType === 'high').length;
+      document.getElementById('anomaly-text').textContent =
+        `זוהו ${anomalies.length} טיסות חריגות${highCount > 0 ? ` (${highCount} חריגות גבוהה) ⚡` : ''} — לחץ על הכרטיס הכתום כדי לסנן אותן`;
+    } else {
+      banner.classList.remove('visible');
+    }
+  }
+}
+
+function rerankAndDisplay() {
+  const scored = computeScores(allFlights);
+  filteredFlights = filterFlights(scored);
+  const sorted = sortFlights(filteredFlights);
+  document.getElementById('results-count').textContent = `${sorted.length} טיסות נמצאו`;
+  updateStats(sorted);
+  renderFlights(sorted);
+}
+
+async function searchFlights() {
+  const btn = document.getElementById('search-btn');
+  btn.disabled = true;
+  btn.textContent = '🔄 מחפש...';
+
+  document.getElementById('loading-state').classList.add('visible');
+  document.getElementById('flights-grid').innerHTML = '';
+  document.getElementById('empty-state').style.display = 'none';
+
+  await new Promise(r => setTimeout(r, 800));
+
+  allFlights = generateMockFlights();
+  populateFilters(allFlights);
+
+  document.getElementById('loading-state').classList.remove('visible');
+  document.getElementById('api-status').textContent = `עודכן ${new Date().toLocaleTimeString('he-IL')}`;
+  document.getElementById('results-count').textContent = `${allFlights.length} טיסות נמצאו`;
+
+  btn.disabled = false;
+  btn.textContent = '🔍 חפש ודרג טיסות';
+
+  rerankAndDisplay();
+}
+
+function populateFilters(flights) {
+  const destSet = new Set(flights.map(f => f.to));
+  const airlineSet = new Set(flights.map(f => f.airlineCode));
+
+  const destSel = document.getElementById('f-dest');
+  destSel.innerHTML = '<option value="">כל היעדים</option>';
+  [...destSet].sort().forEach(code => {
+    const ap = AIRPORTS[code];
+    destSel.innerHTML += `<option value="${code}">${ap ? ap.city : code} (${code})</option>`;
+  });
+
+  const airlineSel = document.getElementById('f-airline');
+  airlineSel.innerHTML = '<option value="">כל החברות</option>';
+  [...airlineSet].sort().forEach(code => {
+    const al = AIRLINES_DATA[code];
+    airlineSel.innerHTML += `<option value="${code}">${al ? al.name : code}</option>`;
+  });
+
+  ['f-origin','f-dest','f-airline','f-stops','f-maxprice'].forEach(id => {
+    const el = document.getElementById(id);
+    el.onchange = () => rerankAndDisplay();
+    el.oninput = () => rerankAndDisplay();
+  });
+}
+
+function showFlightDetail(f, rank) {
+  const modal = document.getElementById('modal-overlay');
+  const content = document.getElementById('modal-content');
+
+  const anomalyBgColor = f.anomalyType === 'high' ? 'rgba(255,87,87,0.1)' :
+                         f.anomalyType === 'medium' ? 'rgba(245,166,35,0.1)' : 'rgba(34,211,165,0.05)';
+
+  content.innerHTML = `
+    <div style="margin-bottom:4px;font-size:12px;color:var(--text3);font-family:'Space Mono',monospace;">#${rank} · ${f.airlineName}</div>
+    <div class="modal-route">${f.from} → ${f.to}</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:16px;">${f.fromCity} → ${f.toCity}</div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="padding:8px 16px;background:rgba(79,124,255,0.1);border:1px solid rgba(79,124,255,0.2);border-radius:8px;text-align:center;">
+        <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--accent);">${f.totalScore}</div>
+        <div style="font-size:10px;color:var(--text3);">ציון כולל</div>
+      </div>
+      <div style="padding:8px 16px;background:rgba(34,211,165,0.1);border:1px solid rgba(34,211,165,0.2);border-radius:8px;text-align:center;">
+        <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green);">$${f.price}</div>
+        <div style="font-size:10px;color:var(--text3);">מחיר</div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h4>פרטי הטיסה</h4>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="d-label">משך טיסה</div>
+          <div class="d-val">${formatDuration(f.duration)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">עצירות</div>
+          <div class="d-val">${f.stops === 0 ? 'ישירה' : f.stops + ' עצירות'}</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">חברת תעופה</div>
+          <div class="d-val" style="font-size:13px;">${f.airlineName}</div>
+        </div>
+        <div class="detail-item">
+          <div class="d-label">ציון איכות</div>
+          <div class="d-val">${f.qualityScore}/10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <h4>פירוט ציונים</h4>
+      <div class="anomaly-bars">
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">איכות חברה</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
+          <span class="anomaly-bar-sigma" style="color:var(--purple);">${f.qualityScore_norm}</span>
+        </div>
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">ציון מחיר</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.priceScore}%;background:var(--green)"></div></div>
+          <span class="anomaly-bar-sigma" style="color:var(--green);">${f.priceScore}</span>
+        </div>
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">ציון זמן</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.timeScore}%;background:var(--cyan)"></div></div>
+          <span class="anomaly-bar-sigma" style="color:var(--cyan);">${f.timeScore}</span>
+        </div>
+      </div>
+    </div>
+
+    ${f.anomalyType !== 'normal' && f.anomalyType !== 'low' ? `
+    <div class="modal-section">
+      <h4>⚠ ניתוח חריגות</h4>
+      <div style="padding:14px;background:${anomalyBgColor};border-radius:8px;margin-bottom:12px;">
+        <div style="font-size:13px;color:var(--amber);font-weight:600;margin-bottom:6px;">
+          חריגות: ${f.anomalyType === 'high' ? 'גבוהה' : 'בינונית'} (σ = ${f.anomalyScore})
+        </div>
+        <div style="font-size:13px;color:var(--text2);">${f.anomalyReason}</div>
+      </div>
+      <div class="anomaly-bars">
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">סטיית מחיר</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zPrice)*33)}%;background:${f.zPrice > 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
+          <span class="anomaly-bar-sigma" style="color:${f.zPrice > 0 ? 'var(--red)' : 'var(--green)'}">${f.zPrice > 0 ? '+' : ''}${f.zPrice}σ</span>
+        </div>
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">סטיית זמן</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zDuration)*33)}%;background:${f.zDuration > 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
+          <span class="anomaly-bar-sigma" style="color:${f.zDuration > 0 ? 'var(--red)' : 'var(--green)'}">${f.zDuration > 0 ? '+' : ''}${f.zDuration}σ</span>
+        </div>
+        <div class="anomaly-bar-row">
+          <span class="anomaly-bar-label">סטיית איכות</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zQuality)*33)}%;background:${f.zQuality < 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
+          <span class="anomaly-bar-sigma" style="color:${f.zQuality < 0 ? 'var(--red)' : 'var(--green)'}">${f.zQuality > 0 ? '+' : ''}${f.zQuality}σ</span>
+        </div>
+      </div>
+    </div>
+    ` : ''}
+  `;
+
+  modal.classList.add('visible');
+}
+
+function closeModal(e) {
+  if (!e || e.target === document.getElementById('modal-overlay')) {
+    document.getElementById('modal-overlay').classList.remove('visible');
+  }
+}
+
+updateWeightDisplay();
+searchFlights();
+</script>
+</body>
+</html>
