@@ -1006,15 +1006,83 @@
   }
   .stat-card.filter-active .s-filter-hint { color: var(--amber); }
 
+  /* SIDEBAR TOGGLE BUTTON */
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text2);
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .sidebar-toggle:hover { background: var(--surface3); color: var(--text); }
+
+  /* DESKTOP: sidebar collapses in place */
+  .app-layout.sidebar-hidden {
+    grid-template-columns: 0 1fr;
+  }
+  .app-layout.sidebar-hidden .sidebar {
+    width: 0;
+    padding: 0;
+    overflow: hidden;
+    border-left: none;
+  }
+
+  /* MOBILE OVERLAY */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 150;
+    backdrop-filter: blur(2px);
+  }
+  .sidebar-overlay.visible { display: block; }
+
   /* RESPONSIVE */
-  @media (max-width: 1024px) {
+  @media (max-width: 768px) {
+    .app-layout {
+      grid-template-columns: 1fr !important;
+    }
+    .sidebar {
+      position: fixed !important;
+      top: 0;
+      right: -320px;
+      width: 300px !important;
+      height: 100vh;
+      max-height: 100vh;
+      z-index: 160;
+      background: var(--surface);
+      border-left: 1px solid var(--border2);
+      transition: right 0.25s ease;
+      padding-top: 72px;
+    }
+    .sidebar.mobile-open {
+      right: 0;
+    }
+    .main-content { padding: 16px; }
+    .stats-bar { grid-template-columns: repeat(2, 1fr); }
+    .fb-top { flex-wrap: wrap; gap: 6px; padding: 10px 12px 8px; }
+    .fb-thead, .fb-tbody { grid-template-columns: repeat(2, 1fr); }
+    .fb-th:nth-child(3), .fb-th:nth-child(4),
+    .fb-td:nth-child(3), .fb-td:nth-child(4) { display: none; }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
     .app-layout { grid-template-columns: 260px 1fr; }
     .stats-bar { grid-template-columns: repeat(2, 1fr); }
-    .table-header-row, .flight-row {
-      grid-template-columns: 36px 1fr 110px 110px 110px 60px;
-      gap: 8px;
-      padding: 8px 14px;
-    }
+    .sidebar { transition: width 0.25s ease, padding 0.25s ease; }
+  }
+
+  @media (min-width: 769px) {
+    .sidebar { transition: width 0.25s ease, padding 0.25s ease; overflow: hidden; }
   }
 </style>
 </head>
@@ -1022,6 +1090,7 @@
 
 <header>
   <div class="logo">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="פתח/סגור תפריט">☰</button>
     <div class="logo-icon">✈</div>
     <div>
       <div class="logo-text">FlightRank</div>
@@ -1033,6 +1102,8 @@
     <span id="api-status">מחפש נתונים...</span>
   </div>
 </header>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="app-layout">
 
@@ -1186,6 +1257,18 @@ const AIRLINES_DATA = {"QR":{"name":"Qatar Airways","quality_score":10,"is_low_c
 const AIRPORTS = {"TLV":{"name":"Ben Gurion International Airport","latitude":32.011398,"longitude":34.8867,"country":"IL","city":"Tel Aviv"},"ETM":{"name":"Ramon International Airport","latitude":29.727009,"longitude":35.014116,"country":"IL","city":"Eilat"},"LHR":{"name":"London Heathrow","latitude":51.470748,"longitude":-0.459909,"country":"GB","city":"London"},"CDG":{"name":"Charles de Gaulle","latitude":49.00896,"longitude":2.554117,"country":"FR","city":"Paris"},"JFK":{"name":"John F. Kennedy","latitude":40.639447,"longitude":-73.779317,"country":"US","city":"New York"},"DXB":{"name":"Dubai International","latitude":25.24979,"longitude":55.370992,"country":"AE","city":"Dubai"},"DOH":{"name":"Hamad International","latitude":25.273056,"longitude":51.608056,"country":"QA","city":"Doha"},"FRA":{"name":"Frankfurt Main","latitude":50.026706,"longitude":8.55835,"country":"DE","city":"Frankfurt"},"AMS":{"name":"Amsterdam Schiphol","latitude":52.308601,"longitude":4.76389,"country":"NL","city":"Amsterdam"},"IST":{"name":"Istanbul Airport","latitude":41.274874,"longitude":28.732136,"country":"TR","city":"Istanbul"},"BKK":{"name":"Suvarnabhumi","latitude":13.6811,"longitude":100.747002,"country":"TH","city":"Bangkok"},"NRT":{"name":"Narita International","latitude":35.76858,"longitude":140.388714,"country":"JP","city":"Tokyo"},"SIN":{"name":"Singapore Changi","latitude":1.35019,"longitude":103.994003,"country":"SG","city":"Singapore"},"FCO":{"name":"Rome Fiumicino","latitude":41.804532,"longitude":12.251998,"country":"IT","city":"Rome"},"BCN":{"name":"Barcelona El Prat","latitude":41.2971,"longitude":2.07846,"country":"ES","city":"Barcelona"},"MUC":{"name":"Munich Airport","latitude":48.353802,"longitude":11.7861,"country":"DE","city":"Munich"},"MAD":{"name":"Madrid Barajas","latitude":40.493407,"longitude":-3.572249,"country":"ES","city":"Madrid"},"ZRH":{"name":"Zurich Airport","latitude":47.458056,"longitude":8.548056,"country":"CH","city":"Zurich"},"VIE":{"name":"Vienna International","latitude":48.110298,"longitude":16.5697,"country":"AT","city":"Vienna"},"ATH":{"name":"Athens Eleftherios Venizelos","latitude":37.936401,"longitude":23.9445,"country":"GR","city":"Athens"},"LAX":{"name":"Los Angeles International","latitude":33.942501,"longitude":-118.407997,"country":"US","city":"Los Angeles"},"ORD":{"name":"Chicago O'Hare","latitude":41.9786,"longitude":-87.9048,"country":"US","city":"Chicago"},"BOS":{"name":"Boston Logan","latitude":42.36197,"longitude":-71.0079,"country":"US","city":"Boston"},"EWR":{"name":"Newark Liberty","latitude":40.6894,"longitude":-74.170545,"country":"US","city":"New York"},"MIA":{"name":"Miami International","latitude":25.796011,"longitude":-80.289751,"country":"US","city":"Miami"},"HKG":{"name":"Hong Kong International","latitude":22.31184,"longitude":113.914862,"country":"HK","city":"Hong Kong"},"SYD":{"name":"Sydney Kingsford Smith","latitude":-33.946098,"longitude":151.177002,"country":"AU","city":"Sydney"},"GRU":{"name":"São Paulo Guarulhos","latitude":-23.431274,"longitude":-46.469954,"country":"BR","city":"São Paulo"}};
 
 let allFlights = [];
+
+function toggleSidebar() {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const isOpen = sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('visible', isOpen);
+  } else {
+    document.querySelector('.app-layout').classList.toggle('sidebar-hidden');
+  }
+}
 let filteredFlights = [];
 let sortMode = 'score';
 let showAnomalies = true;
