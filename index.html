@@ -1,53 +1,58 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlightRank — מדד טיסות חכם</title>
-<meta name="description" content="דרג טיסות לפי מה שחשוב לך — איכות, מחיר וזמן טיסה. מזהה אוטומטית טיסות חריגות ומציאות.">
+<title>FlightRank — Smart Flight Ranker</title>
+<meta name="description" content="Rank flights by what matters to you — airline quality, price, and flight time. Automatically detects deal flights and anomalies.">
 
 <!-- Open Graph (WhatsApp, Telegram, LinkedIn) -->
-<meta property="og:title" content="FlightRank — מדד טיסות חכם">
-<meta property="og:description" content="שקלל בעצמך איכות, מחיר וזמן טיסה. מזהה מציאות חריגות אוטומטית.">
+<meta property="og:title" content="FlightRank — Smart Flight Ranker">
+<meta property="og:description" content="Weigh airline quality, price, and flight time yourself. Automatically spots exceptional deals.">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="he_IL">
+<meta property="og:locale" content="en_US">
 
 <!-- Twitter/X -->
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="FlightRank — מדד טיסות חכם">
-<meta name="twitter:description" content="שקלל בעצמך איכות, מחיר וזמן טיסה. מזהה מציאות חריגות אוטומטית.">
+<meta name="twitter:title" content="FlightRank — Smart Flight Ranker">
+<meta name="twitter:description" content="Weigh airline quality, price, and flight time yourself. Automatically spots exceptional deals.">
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
   :root {
-    --bg: #0a0b0e;
-    --surface: #13151a;
-    --surface2: #1c1f27;
-    --surface3: #252932;
-    --border: rgba(255,255,255,0.06);
-    --border2: rgba(255,255,255,0.12);
-    --text: #f0f2f7;
-    --text2: #8b92a5;
-    --text3: #555e72;
-    --accent: #4f7cff;
-    --accent2: #7c5cfc;
-    --green: #22d3a5;
+    --bg: #0c0d18;
+    --surface: #141628;
+    --surface2: #1d2038;
+    --surface3: #262a42;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.14);
+    --text: #eef0f8;
+    --text2: #8d95b0;
+    --text3: #525c78;
+    --accent: #5a85ff;
+    --accent2: #8466ff;
+    --green: #2de0b0;
     --amber: #f5a623;
-    --red: #ff5757;
-    --purple: #a78bfa;
-    --cyan: #22d3ee;
+    --red: #ff6060;
+    --purple: #b39eff;
+    --cyan: #2adaf5;
+    --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.45);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.55);
+
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'Heebo', sans-serif;
-    background: var(--bg);
+    background: radial-gradient(ellipse at 25% 0%, rgba(90,133,255,0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 75% 100%, rgba(132,102,255,0.04) 0%, transparent 50%),
+                var(--bg);
     color: var(--text);
     min-height: 100vh;
-    direction: rtl;
   }
 
   /* HEADER */
@@ -59,7 +64,7 @@
     justify-content: space-between;
     position: sticky;
     top: 0;
-    background: rgba(10,11,14,0.92);
+    background: rgba(12,13,24,0.94);
     backdrop-filter: blur(20px);
     z-index: 100;
   }
@@ -82,18 +87,21 @@
   }
 
   .logo-text {
-    font-family: 'Space Mono', monospace;
-    font-size: 16px;
+    font-family: 'Heebo', sans-serif;
+    font-size: 17px;
     font-weight: 700;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
   .logo-sub {
     font-size: 11px;
     color: var(--text3);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    font-family: 'Heebo', sans-serif;
+    letter-spacing: 0.5px;
   }
 
   .status-badge {
@@ -130,7 +138,7 @@
 
   /* SIDEBAR */
   .sidebar {
-    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     padding: 24px;
     overflow-y: auto;
     max-height: calc(100vh - 73px);
@@ -143,12 +151,25 @@
   }
 
   .sidebar-section h3 {
-    font-size: 10px;
-    letter-spacing: 2px;
+    font-size: 11px;
+    letter-spacing: 0.4px;
     text-transform: uppercase;
-    color: var(--text3);
-    margin-bottom: 16px;
-    font-family: 'Space Mono', monospace;
+    color: var(--text2);
+    margin-bottom: 14px;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sidebar-section h3::before {
+    content: '';
+    display: inline-block;
+    width: 3px;
+    height: 14px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2));
+    border-radius: 2px;
+    flex-shrink: 0;
   }
 
   /* WEIGHT SLIDERS */
@@ -169,8 +190,8 @@
   .weight-slider {
     flex: 1;
     -webkit-appearance: none;
-    height: 3px;
-    border-radius: 2px;
+    height: 5px;
+    border-radius: 3px;
     background: var(--surface3);
     outline: none;
     cursor: pointer;
@@ -178,17 +199,18 @@
 
   .weight-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: var(--accent);
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
     cursor: pointer;
-    box-shadow: 0 0 0 3px rgba(79,124,255,0.2);
-    transition: box-shadow 0.15s;
+    box-shadow: 0 0 0 3px rgba(90,133,255,0.2), 0 2px 6px rgba(0,0,0,0.3);
+    transition: box-shadow 0.15s, transform 0.1s;
   }
 
   .weight-slider::-webkit-slider-thumb:hover {
-    box-shadow: 0 0 0 5px rgba(79,124,255,0.3);
+    box-shadow: 0 0 0 6px rgba(90,133,255,0.25), 0 2px 8px rgba(0,0,0,0.4);
+    transform: scale(1.1);
   }
 
   .weight-val {
@@ -226,6 +248,7 @@
 
   .filter-input:focus {
     border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(90,133,255,0.15);
   }
 
   .filter-input option {
@@ -279,20 +302,22 @@
   /* ACTION BUTTON */
   .search-btn {
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     color: white;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
     font-family: 'Heebo', sans-serif;
-    transition: opacity 0.2s, transform 0.1s;
+    transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 4px 18px rgba(90,133,255,0.3);
+    letter-spacing: 0.3px;
   }
 
-  .search-btn:hover { opacity: 0.9; }
-  .search-btn:active { transform: scale(0.98); }
+  .search-btn:hover { opacity: 0.92; box-shadow: 0 6px 24px rgba(90,133,255,0.45); transform: translateY(-1px); }
+  .search-btn:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(90,133,255,0.2); }
 
   .search-btn:disabled {
     opacity: 0.5;
@@ -341,6 +366,7 @@
   .sort-tab.active {
     background: var(--surface3);
     color: var(--text);
+    font-weight: 600;
   }
 
   /* STATS BAR */
@@ -354,22 +380,26 @@
   .stat-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-sm);
   }
 
   .stat-card .s-label {
     font-size: 11px;
     color: var(--text3);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
     margin-bottom: 6px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
   }
 
   .stat-card .s-val {
-    font-size: 22px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
     font-family: 'Space Mono', monospace;
+    letter-spacing: -0.5px;
   }
 
   /* ANOMALY BANNER */
@@ -426,7 +456,7 @@
   .flight-card.anomaly::before {
     content: '';
     position: absolute;
-    top: 0; right: 0;
+    top: 0; left: 0;
     width: 3px;
     height: 100%;
     background: var(--amber);
@@ -439,7 +469,7 @@
   .flight-card.top-ranked::before {
     content: '';
     position: absolute;
-    top: 0; right: 0;
+    top: 0; left: 0;
     width: 3px;
     height: 100%;
     background: var(--accent);
@@ -514,7 +544,7 @@
   .score-bar-label {
     width: 40px;
     color: var(--text3);
-    text-align: right;
+    text-align: left;
     font-size: 10px;
   }
 
@@ -574,10 +604,12 @@
   }
 
   .anomaly-chip {
-    padding: 3px 8px;
-    border-radius: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
     font-size: 10px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
   }
 
   .anomaly-chip.high {
@@ -634,7 +666,7 @@
   .loading-text {
     font-size: 13px;
     color: var(--text3);
-    font-family: 'Space Mono', monospace;
+    font-family: 'Heebo', sans-serif;
   }
 
   /* EMPTY STATE */
@@ -676,12 +708,13 @@
   .modal {
     background: var(--surface);
     border: 1px solid var(--border2);
-    border-radius: 18px;
-    padding: 28px;
+    border-radius: 20px;
+    padding: 32px;
     width: 520px;
     max-height: 80vh;
     overflow-y: auto;
     position: relative;
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.04);
   }
 
   .modal h2 {
@@ -692,7 +725,7 @@
   .modal-close {
     position: absolute;
     top: 20px;
-    left: 20px;
+    right: 20px;
     background: var(--surface2);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -781,7 +814,7 @@
   .anomaly-bar-label {
     width: 100px;
     color: var(--text2);
-    text-align: right;
+    text-align: left;
   }
 
   .anomaly-bar-track {
@@ -814,18 +847,24 @@
   .flight-block {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
-    border-right: 3px solid transparent;
-    transition: border-color 0.15s, background 0.15s;
+    border-left: 3px solid transparent;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+    box-shadow: var(--shadow-sm);
   }
-  .flight-block:hover { border-color: var(--border2); background: var(--surface2); }
+  .flight-block:hover {
+    border-color: var(--border2);
+    background: var(--surface2);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
   .flight-block:hover .fb-bottom { background: rgba(255,255,255,0.01); }
-  .flight-block.rank-1 { border-right-color: #fbbf24; }
-  .flight-block.rank-2 { border-right-color: #94a3b8; }
-  .flight-block.rank-3 { border-right-color: #b87333; }
-  .flight-block.is-deal { border-right-color: var(--amber); background: rgba(245,166,35,0.03); }
+  .flight-block.rank-1 { border-left-color: #fbbf24; box-shadow: 0 2px 12px rgba(251,191,36,0.1); }
+  .flight-block.rank-2 { border-left-color: #94a3b8; }
+  .flight-block.rank-3 { border-left-color: #cd7f32; }
+  .flight-block.is-deal { border-left-color: var(--amber); background: rgba(245,166,35,0.04); box-shadow: 0 2px 12px rgba(245,166,35,0.1); }
 
   /* Row 1: flight identity */
   .fb-top {
@@ -887,8 +926,6 @@
     display: inline-flex;
     align-items: baseline;
     gap: 4px;
-    direction: ltr;
-    unicode-bidi: isolate;
   }
   .fb-times .t-arr { color: var(--text2); }
   .fb-times .t-plus {
@@ -904,16 +941,17 @@
   .deal-badge {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
-    padding: 3px 8px;
+    gap: 4px;
+    padding: 4px 10px;
     background: rgba(245,166,35,0.15);
-    border: 1px solid rgba(245,166,35,0.3);
-    border-radius: 5px;
+    border: 1px solid rgba(245,166,35,0.35);
+    border-radius: 20px;
     font-size: 11px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Heebo', sans-serif;
     color: var(--amber);
     font-weight: 700;
     white-space: nowrap;
+    box-shadow: 0 0 10px rgba(245,166,35,0.1);
   }
 
   /* Metrics: 2-row table (header row + values row) */
@@ -938,18 +976,18 @@
     letter-spacing: 1.5px;
     text-transform: uppercase;
     font-family: 'Space Mono', monospace;
-    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
   }
-  .fb-th:last-child { border-left: none; }
+  .fb-th:last-child { border-right: none; }
 
   .fb-td {
     padding: 10px 16px;
-    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 10px;
   }
-  .fb-td:last-child { border-left: none; }
+  .fb-td:last-child { border-right: none; }
 
   .fb-td .td-val {
     font-family: 'Space Mono', monospace;
@@ -1007,23 +1045,24 @@
     font-family: 'Space Mono', monospace;
     margin-top: 2px;
   }
-  .score-pill.excellent { background: rgba(34,211,165,0.12); color: var(--green); border: 1px solid rgba(34,211,165,0.2); }
-  .score-pill.good      { background: rgba(34,211,238,0.12); color: var(--cyan);  border: 1px solid rgba(34,211,238,0.2); }
-  .score-pill.medium    { background: rgba(245,166,35,0.12); color: var(--amber); border: 1px solid rgba(245,166,35,0.2); }
-  .score-pill.low       { background: rgba(255,87,87,0.12);  color: var(--red);   border: 1px solid rgba(255,87,87,0.2); }
+  .score-pill.excellent { background: rgba(45,224,176,0.15); color: var(--green); border: 1px solid rgba(45,224,176,0.35); box-shadow: 0 0 12px rgba(45,224,176,0.08); }
+  .score-pill.good      { background: rgba(42,218,245,0.15); color: var(--cyan);  border: 1px solid rgba(42,218,245,0.35); box-shadow: 0 0 12px rgba(42,218,245,0.08); }
+  .score-pill.medium    { background: rgba(245,166,35,0.15); color: var(--amber); border: 1px solid rgba(245,166,35,0.35); box-shadow: 0 0 12px rgba(245,166,35,0.08); }
+  .score-pill.low       { background: rgba(255,96,96,0.15);  color: var(--red);   border: 1px solid rgba(255,96,96,0.35);  box-shadow: 0 0 12px rgba(255,96,96,0.08); }
 
   /* Stat card clickable/active for deal filter */
-  .stat-card.clickable { cursor: pointer; transition: border-color 0.2s, background 0.2s; }
-  .stat-card.clickable:hover { border-color: var(--border2); background: var(--surface2); }
+  .stat-card.clickable { cursor: pointer; transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s; }
+  .stat-card.clickable:hover { border-color: var(--border2); background: var(--surface2); transform: translateY(-1px); box-shadow: var(--shadow-md); }
   .stat-card.filter-active {
-    border-color: rgba(245,166,35,0.4) !important;
-    background: rgba(245,166,35,0.06) !important;
+    border-color: rgba(245,166,35,0.45) !important;
+    background: rgba(245,166,35,0.07) !important;
+    box-shadow: 0 4px 16px rgba(245,166,35,0.12) !important;
   }
   .stat-card .s-filter-hint {
     font-size: 9px;
     color: var(--text3);
     margin-top: 4px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Heebo', sans-serif;
   }
   .stat-card.filter-active .s-filter-hint { color: var(--amber); }
 
@@ -1053,7 +1092,7 @@
     width: 0;
     padding: 0;
     overflow: hidden;
-    border-left: none;
+    border-right: none;
   }
 
   /* MOBILE OVERLAY */
@@ -1075,18 +1114,18 @@
     .sidebar {
       position: fixed !important;
       top: 0;
-      right: -320px;
+      left: -320px;
       width: 300px !important;
       height: 100vh;
       max-height: 100vh;
       z-index: 160;
       background: var(--surface);
-      border-left: 1px solid var(--border2);
-      transition: right 0.25s ease;
+      border-right: 1px solid var(--border2);
+      transition: left 0.25s ease;
       padding-top: 72px;
     }
     .sidebar.mobile-open {
-      right: 0;
+      left: 0;
     }
     .main-content { padding: 16px; }
     .stats-bar { grid-template-columns: repeat(2, 1fr); }
@@ -1189,16 +1228,16 @@
 
 <header>
   <div class="logo">
-    <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="פתח/סגור תפריט">☰</button>
+    <button class="sidebar-toggle" onclick="toggleSidebar()" id="sidebar-toggle-btn" title="Open/close menu">☰</button>
     <div class="logo-icon">✈</div>
     <div>
       <div class="logo-text">FlightRank</div>
-      <div class="logo-sub">מדד טיסות חכם</div>
+      <div class="logo-sub">Smart Flight Ranker</div>
     </div>
   </div>
   <div class="status-badge">
     <div class="status-dot"></div>
-    <span id="api-status">מחפש נתונים...</span>
+    <span id="api-status">Loading data...</span>
   </div>
 </header>
 
@@ -1210,90 +1249,91 @@
   <aside class="sidebar">
 
     <div class="sidebar-section">
-      <h3>⚖ משקל קריטריונים</h3>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">שנה את המשקל כדי להתאים לסגנונך</div>
+      <h3>⚖ Criteria Weights</h3>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:14px;">Adjust weights to match your travel style</div>
 
       <div class="weight-row">
-        <span class="weight-label">איכות חברה</span>
+        <span class="weight-label">Airline Quality</span>
         <input type="range" class="weight-slider" id="w-quality" min="0" max="100" value="40">
         <span class="weight-val" id="wv-quality">40%</span>
       </div>
       <div class="weight-row">
-        <span class="weight-label">מחיר</span>
+        <span class="weight-label">Price</span>
         <input type="range" class="weight-slider" id="w-price" min="0" max="100" value="35">
         <span class="weight-val" id="wv-price">35%</span>
       </div>
       <div class="weight-row">
-        <span class="weight-label">זמן טיסה</span>
+        <span class="weight-label">Flight Time</span>
         <input type="range" class="weight-slider" id="w-time" min="0" max="100" value="25">
         <span class="weight-val" id="wv-time">25%</span>
       </div>
 
-      <div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);">
-        סה"כ: <span id="weight-total" style="color:var(--amber);font-family:'Space Mono',monospace;">100%</span>
+      <div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text3);display:flex;align-items:center;justify-content:space-between;">
+        <span>Total: <span id="weight-total" style="color:var(--amber);font-family:'Space Mono',monospace;">100%</span></span>
+        <button id="weights-reset-btn" onclick="resetWeights()" style="background:none;border:none;font-size:11px;font-family:'Heebo',sans-serif;cursor:pointer;color:var(--text3);padding:0;transition:color 0.15s;" title="Reset to defaults">↺ Reset</button>
       </div>
     </div>
 
     <div class="sidebar-section">
-      <h3>🔍 סינון</h3>
+      <h3>🔍 Filters</h3>
       <div class="filter-group">
-        <label class="filter-label">נקודת מוצא</label>
+        <label class="filter-label">Origin</label>
         <select class="filter-input" id="f-origin">
-          <option value="">כל הנקודות</option>
+          <option value="">All Origins</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">יעד</label>
+        <label class="filter-label">Destination</label>
         <select class="filter-input" id="f-dest">
-          <option value="">כל היעדים</option>
+          <option value="">All Destinations</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">חברת תעופה</label>
+        <label class="filter-label">Airline</label>
         <select class="filter-input" id="f-airline">
-          <option value="">כל החברות</option>
+          <option value="">All Airlines</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">עצירות מקסימאלי</label>
+        <label class="filter-label">Max Stops</label>
         <select class="filter-input" id="f-stops">
-          <option value="-1">כל הטיסות</option>
-          <option value="0">ישיר בלבד</option>
-          <option value="1">עד עצירה אחת</option>
-          <option value="2">עד שתי עצירות</option>
+          <option value="-1">Any</option>
+          <option value="0">Direct only</option>
+          <option value="1">Up to 1 stop</option>
+          <option value="2">Up to 2 stops</option>
         </select>
       </div>
       <div class="filter-group">
-        <label class="filter-label">תאריך טיסה</label>
+        <label class="filter-label">Departure Date</label>
         <div class="cal-wrap">
           <div class="cal-header">
-            <button class="cal-nav" onclick="calPrevMonth()">›</button>
+            <button class="cal-nav" onclick="calPrevMonth()">‹</button>
             <span class="cal-month-label" id="cal-month-label">—</span>
-            <button class="cal-nav" onclick="calNextMonth()">‹</button>
+            <button class="cal-nav" onclick="calNextMonth()">›</button>
           </div>
           <div class="cal-grid" id="cal-grid"></div>
-          <button class="cal-clear-btn all-active" id="cal-clear-btn" onclick="calClearDate()">כל התאריכים</button>
+          <button class="cal-clear-btn all-active" id="cal-clear-btn" onclick="calClearDate()">All Dates</button>
         </div>
       </div>
       <div class="filter-group">
-        <label class="filter-label">מחיר מקסימאלי ($)</label>
-        <input type="number" class="filter-input" id="f-maxprice" placeholder="ללא הגבלה" min="0">
+        <label class="filter-label">Max Price ($)</label>
+        <input type="number" class="filter-input" id="f-maxprice" placeholder="No limit" min="0">
       </div>
     </div>
 
     <div class="sidebar-section">
-      <h3>⚡ זיהוי חריגויות</h3>
+      <h3>⚡ Deal Detection</h3>
       <div class="anomaly-toggle" onclick="toggleAnomaly()">
-        <span style="font-size:13px;color:var(--text2);">הצג חריגויות</span>
+        <span style="font-size:13px;color:var(--text2);">Show anomalies</span>
         <div class="toggle-switch on" id="anomaly-toggle"></div>
       </div>
       <div style="font-size:11px;color:var(--text3);line-height:1.6;">
-        מזהה טיסות שסוטות מהנורמה ביחס לקריטריונים — מציאות חד-פעמיות או בעיות מוסתרות
+        Detects flights that deviate from the norm — one-time deals or hidden issues
       </div>
     </div>
 
     <button class="search-btn" onclick="searchFlights()" id="search-btn">
-      🔍 חפש ודרג טיסות
+      🔍 Search & Rank Flights
     </button>
 
   </aside>
@@ -1302,31 +1342,31 @@
   <main class="main-content">
 
     <div class="content-topbar">
-      <div class="results-count" id="results-count">טוען נתונים...</div>
+      <div class="results-count" id="results-count">Loading...</div>
       <div class="sort-tabs">
-        <button class="sort-tab active" onclick="setSortMode('score')" id="tab-score">ציון</button>
-        <button class="sort-tab" onclick="setSortMode('price')" id="tab-price">מחיר</button>
-        <button class="sort-tab" onclick="setSortMode('time')" id="tab-time">זמן</button>
-        <button class="sort-tab" onclick="setSortMode('anomaly')" id="tab-anomaly">חריגות</button>
+        <button class="sort-tab active" onclick="setSortMode('score')" id="tab-score">Score</button>
+        <button class="sort-tab" onclick="setSortMode('price')" id="tab-price">Price</button>
+        <button class="sort-tab" onclick="setSortMode('time')" id="tab-time">Time</button>
+        <button class="sort-tab" onclick="setSortMode('anomaly')" id="tab-anomaly">Deals</button>
       </div>
     </div>
 
     <div class="stats-bar">
       <div class="stat-card">
-        <div class="s-label">טיסות נמצאו</div>
+        <div class="s-label">Flights Found</div>
         <div class="s-val" id="stat-count" style="color:var(--accent)">—</div>
       </div>
       <div class="stat-card">
-        <div class="s-label">ממוצע מחיר</div>
+        <div class="s-label">Avg Price</div>
         <div class="s-val" id="stat-avgprice" style="color:var(--green)">—</div>
       </div>
-      <div class="stat-card clickable" id="deal-filter-card" onclick="toggleDealFilter()" title="לחץ לסנן רק טיסות חריגות">
-        <div class="s-label">🔥 טיסות חריגות</div>
+      <div class="stat-card clickable" id="deal-filter-card" onclick="toggleDealFilter()" title="Click to filter deal flights only">
+        <div class="s-label">🔥 Deal Flights</div>
         <div class="s-val" id="stat-anomalies" style="color:var(--amber)">—</div>
-        <div class="s-filter-hint" id="deal-filter-hint">לחץ לסינון</div>
+        <div class="s-filter-hint" id="deal-filter-hint">Click to filter</div>
       </div>
       <div class="stat-card">
-        <div class="s-label">ציון ממוצע</div>
+        <div class="s-label">Avg Score</div>
         <div class="s-val" id="stat-avgscore" style="color:var(--purple)">—</div>
       </div>
     </div>
@@ -1338,14 +1378,14 @@
 
     <div class="loading-state visible" id="loading-state">
       <div class="spinner"></div>
-      <div class="loading-text">טוען טיסות בזמן אמת...</div>
+      <div class="loading-text">Loading flights in real time...</div>
     </div>
 
     <div id="flights-container">
       <div class="flights-grid" id="flights-grid"></div>
       <div class="empty-state" id="empty-state" style="display:none;">
         <div class="empty-icon">✈</div>
-        <div class="empty-text">לא נמצאו טיסות התואמות לחיפוש שלך</div>
+        <div class="empty-text">No flights match your search</div>
       </div>
     </div>
 
@@ -1511,7 +1551,7 @@ function toggleDealFilter() {
   const card = document.getElementById('deal-filter-card');
   const hint = document.getElementById('deal-filter-hint');
   card.classList.toggle('filter-active', filterDeals);
-  hint.textContent = filterDeals ? '✕ בטל סינון' : 'לחץ לסינון';
+  hint.textContent = filterDeals ? '✕ Clear filter' : 'Click to filter';
   if (allFlights.length > 0) rerankAndDisplay();
 }
 
@@ -1522,6 +1562,8 @@ function getWeights() {
   return { quality: q/100, price: p/100, time: t/100, total: q+p+t };
 }
 
+const WEIGHT_DEFAULTS = { quality: 40, price: 35, time: 25 };
+
 function updateWeightDisplay() {
   ['quality','price','time'].forEach(k => {
     document.getElementById('wv-'+k).textContent = document.getElementById('w-'+k).value + '%';
@@ -1530,6 +1572,19 @@ function updateWeightDisplay() {
   const el = document.getElementById('weight-total');
   el.textContent = total + '%';
   el.style.color = total === 100 ? 'var(--green)' : 'var(--amber)';
+
+  const isDefault = ['quality','price','time'].every(k => +document.getElementById('w-'+k).value === WEIGHT_DEFAULTS[k]);
+  const btn = document.getElementById('weights-reset-btn');
+  btn.style.color = isDefault ? 'var(--text3)' : 'var(--accent)';
+  btn.style.pointerEvents = isDefault ? 'none' : 'auto';
+}
+
+function resetWeights() {
+  ['quality','price','time'].forEach(k => {
+    document.getElementById('w-'+k).value = WEIGHT_DEFAULTS[k];
+  });
+  updateWeightDisplay();
+  if (allFlights.length > 0) rerankAndDisplay();
 }
 
 // Constrained sliders: always sum to 100%
@@ -1790,10 +1845,10 @@ function computeScores(flights) {
     let anomalyType = 'normal', anomalyReason = '';
     if (zRoute <= -1.3 && saving >= 30) {
       anomalyType   = 'high';
-      anomalyReason = `מחיר נמוך בצורה חריגה מאוד — $${saving} מתחת לממוצע המסלול`;
+      anomalyReason = `Exceptionally low price — $${saving} below route average`;
     } else if (zRoute <= -1.15 && saving >= 30) {
       anomalyType   = 'medium';
-      anomalyReason = `מחיר נמוך חריג — $${saving} מתחת לממוצע המסלול`;
+      anomalyReason = `Unusually low price — $${saving} below route average`;
     }
 
     return {
@@ -1844,7 +1899,7 @@ function sortFlights(flights) {
 function formatDuration(mins) {
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return `${h}ש ${m}ד`;
+  return `${h}h ${m}m`;
 }
 
 function getScoreClass(score) {
@@ -1876,7 +1931,7 @@ function renderFlights(flights) {
     const blockClass = [i < 3 ? `rank-${i+1}` : '', isDeal ? 'is-deal' : ''].join(' ').trim();
     const sc = f.totalScore >= 75 ? 'excellent' : f.totalScore >= 55 ? 'good' : f.totalScore >= 35 ? 'medium' : 'low';
     const dealBadge = isDeal
-      ? `<span class="deal-badge">⚡ חריגה${f.anomalyType === 'high' ? ' גבוהה' : ''}</span>`
+      ? `<span class="deal-badge">⚡ ${f.anomalyType === 'high' ? 'Hot Deal' : 'Deal'}</span>`
       : '';
     const timesHtml = f.depTime
       ? `<span class="fb-times">${f.depTime}<span class="t-arr">→ ${f.arrTime}</span>${f.dayDiff > 0 ? `<span class="t-plus">+${f.dayDiff}</span>` : ''}</span><span class="fb-divider">·</span>`
@@ -1897,7 +1952,7 @@ function renderFlights(flights) {
         <span class="fb-airline">${f.airlineName}</span>
         <span class="fb-divider">·</span>
         ${timesHtml}
-        <span class="fb-meta">${f.stops === 0 ? 'ישיר' : f.stops + ' עצירות'} · ${formatDuration(f.duration)}</span>
+        <span class="fb-meta">${f.stops === 0 ? 'Direct' : f.stops + (f.stops === 1 ? ' stop' : ' stops')} · ${formatDuration(f.duration)}</span>
         <div class="fb-spacer"></div>
         ${dealBadge}
       </div>
@@ -1905,17 +1960,17 @@ function renderFlights(flights) {
       <!-- Metrics table: row 1 = headers, row 2 = values -->
       <div class="fb-table">
         <div class="fb-thead">
-          <div class="fb-th">מחיר</div>
-          <div class="fb-th">איכות חברה</div>
-          <div class="fb-th">ציון חברה</div>
-          <div class="fb-th">ציון כולל</div>
+          <div class="fb-th">Price</div>
+          <div class="fb-th">Airline Quality</div>
+          <div class="fb-th">Quality Score</div>
+          <div class="fb-th">Total Score</div>
         </div>
         <div class="fb-tbody">
           <div class="fb-td">
             <div class="td-val" style="color:var(--green)">$${f.price}</div>
             <div class="td-bar-wrap">
               <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.priceScore}%;background:var(--green)"></div></div>
-              <div class="td-sub">ציון ${f.priceScore}/100</div>
+              <div class="td-sub">Score ${f.priceScore}/100</div>
             </div>
           </div>
           <div class="fb-td">
@@ -1929,7 +1984,7 @@ function renderFlights(flights) {
             <div class="td-val" style="color:var(--purple)">${f.qualityScore_norm}</div>
             <div class="td-bar-wrap">
               <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
-              <div class="td-sub">יחסי לתוצאות</div>
+              <div class="td-sub">Relative score</div>
             </div>
           </div>
           <div class="fb-td">
@@ -1967,7 +2022,7 @@ function updateStats(flights) {
       banner.classList.add('visible');
       const highCount = anomalies.filter(f => f.anomalyType === 'high').length;
       document.getElementById('anomaly-text').textContent =
-        `זוהו ${anomalies.length} טיסות חריגות${highCount > 0 ? ` (${highCount} חריגות גבוהה) ⚡` : ''} — לחץ על הכרטיס הכתום כדי לסנן אותן`;
+        `${anomalies.length} deal flights detected${highCount > 0 ? ` (${highCount} hot deals) ⚡` : ''} — click the orange card to filter`;
     } else {
       banner.classList.remove('visible');
     }
@@ -1978,7 +2033,7 @@ function rerankAndDisplay() {
   const scored = computeScores(allFlights);
   filteredFlights = filterFlights(scored);
   const sorted = sortFlights(filteredFlights);
-  document.getElementById('results-count').textContent = `${sorted.length} טיסות נמצאו`;
+  document.getElementById('results-count').textContent = `${sorted.length} flights found`;
   updateStats(sorted);
   renderFlights(sorted);
 }
@@ -2049,9 +2104,9 @@ function enrichFlight(f) {
   };
 }
 
-function formatDateHe(d) {
+function formatDateEn(d) {
   const dt = new Date(d + 'T12:00:00');
-  return dt.toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'long' });
+  return dt.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'long' });
 }
 
 function populateDatePicker(dates) {
@@ -2062,8 +2117,8 @@ function populateDatePicker(dates) {
   renderCalendar();
 }
 
-const CAL_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const CAL_DAYS   = ['א','ב','ג','ד','ה','ו','ש'];
+const CAL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const CAL_DAYS   = ['S','M','T','W','T','F','S'];
 
 function renderCalendar() {
   const year  = calViewDate.getFullYear();
@@ -2106,10 +2161,10 @@ function renderCalendar() {
 
   const btn = document.getElementById('cal-clear-btn');
   if (selectedDate) {
-    btn.textContent = `✕ נקה — ${formatDateHe(selectedDate)}`;
+    btn.textContent = `✕ Clear — ${formatDateEn(selectedDate)}`;
     btn.classList.remove('all-active');
   } else {
-    btn.textContent = 'כל התאריכים';
+    btn.textContent = 'All Dates';
     btn.classList.add('all-active');
   }
 }
@@ -2139,7 +2194,7 @@ function calNextMonth() {
 async function searchFlights() {
   const btn = document.getElementById('search-btn');
   btn.disabled = true;
-  btn.textContent = '🔄 טוען...';
+  btn.textContent = '🔄 Loading...';
   document.getElementById('loading-state').classList.add('visible');
   document.getElementById('flights-grid').innerHTML = '';
   document.getElementById('empty-state').style.display = 'none';
@@ -2156,18 +2211,18 @@ async function searchFlights() {
     allFlights = data.flights.map(enrichFlight);
 
     document.getElementById('api-status').textContent =
-      `✓ נתונים מ-${data.fetched_at?.slice(0,10) || '?'} · ${allFlights.length} טיסות`;
+      `✓ Data from ${data.fetched_at?.slice(0,10) || '?'} · ${allFlights.length} flights`;
   } catch (e) {
     // Fallback: mock data
     allFlights = generateMockFlights();
-    document.getElementById('api-status').textContent = '⚠ נתוני דמו (flights.json לא נמצא)';
+    document.getElementById('api-status').textContent = '⚠ Demo data (flights.json not found)';
   }
 
   populateFilters(allFlights);
   document.getElementById('loading-state').classList.remove('visible');
-  document.getElementById('results-count').textContent = `${allFlights.length} טיסות נמצאו`;
+  document.getElementById('results-count').textContent = `${allFlights.length} flights found`;
   btn.disabled = false;
-  btn.textContent = '🔍 חפש ודרג טיסות';
+  btn.textContent = '🔍 Search & Rank Flights';
   rerankAndDisplay();
 }
 
@@ -2179,7 +2234,7 @@ function populateFilters(flights) {
   // Group airports by region for origin dropdown
   const regionOrder = ['Middle East','Europe','Americas','Asia','Africa','Oceania'];
   const originSel = document.getElementById('f-origin');
-  originSel.innerHTML = '<option value="">כל הנקודות</option>';
+  originSel.innerHTML = '<option value="">All Origins</option>';
   regionOrder.forEach(region => {
     const codes = [...originSet].filter(c => AIRPORTS[c]?.region === region).sort((a,b) => AIRPORTS[a].city.localeCompare(AIRPORTS[b].city));
     if (codes.length === 0) return;
@@ -2193,7 +2248,7 @@ function populateFilters(flights) {
   });
 
   const destSel = document.getElementById('f-dest');
-  destSel.innerHTML = '<option value="">כל היעדים</option>';
+  destSel.innerHTML = '<option value="">All Destinations</option>';
   regionOrder.forEach(region => {
     const codes = [...destSet].filter(c => AIRPORTS[c]?.region === region).sort((a,b) => AIRPORTS[a].city.localeCompare(AIRPORTS[b].city));
     if (codes.length === 0) return;
@@ -2207,7 +2262,7 @@ function populateFilters(flights) {
   });
 
   const airlineSel = document.getElementById('f-airline');
-  airlineSel.innerHTML = '<option value="">כל החברות</option>';
+  airlineSel.innerHTML = '<option value="">All Airlines</option>';
   [...airlineSet].sort().forEach(code => {
     const al = AIRLINES_DATA[code];
     airlineSel.innerHTML += `<option value="${code}">${al ? al.name : code}</option>`;
@@ -2235,51 +2290,51 @@ function showFlightDetail(f, rank) {
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <div style="padding:8px 16px;background:rgba(79,124,255,0.1);border:1px solid rgba(79,124,255,0.2);border-radius:8px;text-align:center;">
         <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--accent);">${f.totalScore}</div>
-        <div style="font-size:10px;color:var(--text3);">ציון כולל</div>
+        <div style="font-size:10px;color:var(--text3);">Total Score</div>
       </div>
       <div style="padding:8px 16px;background:rgba(34,211,165,0.1);border:1px solid rgba(34,211,165,0.2);border-radius:8px;text-align:center;">
         <div style="font-size:28px;font-weight:700;font-family:'Space Mono',monospace;color:var(--green);">$${f.price}</div>
-        <div style="font-size:10px;color:var(--text3);">מחיר</div>
+        <div style="font-size:10px;color:var(--text3);">Price</div>
       </div>
     </div>
 
     <div class="modal-section">
-      <h4>פרטי הטיסה</h4>
+      <h4>Flight Details</h4>
       <div class="detail-grid">
         <div class="detail-item">
-          <div class="d-label">משך טיסה</div>
+          <div class="d-label">Duration</div>
           <div class="d-val">${formatDuration(f.duration)}</div>
         </div>
         <div class="detail-item">
-          <div class="d-label">עצירות</div>
-          <div class="d-val">${f.stops === 0 ? 'ישירה' : f.stops + ' עצירות'}</div>
+          <div class="d-label">Stops</div>
+          <div class="d-val">${f.stops === 0 ? 'Direct' : f.stops + (f.stops === 1 ? ' stop' : ' stops')}</div>
         </div>
         <div class="detail-item">
-          <div class="d-label">חברת תעופה</div>
+          <div class="d-label">Airline</div>
           <div class="d-val" style="font-size:13px;">${f.airlineName}</div>
         </div>
         <div class="detail-item">
-          <div class="d-label">ציון איכות</div>
+          <div class="d-label">Quality Score</div>
           <div class="d-val">${f.qualityScore}/10</div>
         </div>
       </div>
     </div>
 
     <div class="modal-section">
-      <h4>פירוט ציונים</h4>
+      <h4>Score Breakdown</h4>
       <div class="anomaly-bars">
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">איכות חברה</span>
+          <span class="anomaly-bar-label">Airline Quality</span>
           <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
           <span class="anomaly-bar-sigma" style="color:var(--purple);">${f.qualityScore_norm}</span>
         </div>
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">ציון מחיר</span>
+          <span class="anomaly-bar-label">Price Score</span>
           <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.priceScore}%;background:var(--green)"></div></div>
           <span class="anomaly-bar-sigma" style="color:var(--green);">${f.priceScore}</span>
         </div>
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">ציון זמן</span>
+          <span class="anomaly-bar-label">Time Score</span>
           <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.timeScore}%;background:var(--cyan)"></div></div>
           <span class="anomaly-bar-sigma" style="color:var(--cyan);">${f.timeScore}</span>
         </div>
@@ -2288,21 +2343,21 @@ function showFlightDetail(f, rank) {
 
     ${f.anomalyType !== 'normal' && f.anomalyType !== 'low' ? `
     <div class="modal-section">
-      <h4>⚠ ניתוח חריגות</h4>
+      <h4>⚠ Deal Analysis</h4>
       <div style="padding:14px;background:${anomalyBgColor};border-radius:8px;margin-bottom:12px;">
         <div style="font-size:13px;color:var(--amber);font-weight:600;margin-bottom:6px;">
-          חריגות: ${f.anomalyType === 'high' ? 'גבוהה' : 'בינונית'} (σ = ${f.anomalyScore})
+          Anomaly: ${f.anomalyType === 'high' ? 'High' : 'Medium'} (σ = ${f.anomalyScore})
         </div>
         <div style="font-size:13px;color:var(--text2);">${f.anomalyReason}</div>
       </div>
       <div class="anomaly-bars">
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">סטייה מממוצע מסלול</span>
+          <span class="anomaly-bar-label">Deviation from route avg</span>
           <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100, Math.abs(f.zRoute) * 25)}%;background:var(--green)"></div></div>
           <span class="anomaly-bar-sigma" style="color:var(--green)">${f.zRoute}σ</span>
         </div>
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">ממוצע מסלול</span>
+          <span class="anomaly-bar-label">Route average</span>
           <div class="anomaly-bar-track" style="background:transparent"></div>
           <span class="anomaly-bar-sigma" style="color:var(--text2);font-size:12px;">$${f.routeAvg}</span>
         </div>
