@@ -1141,8 +1141,6 @@
         <label class="filter-label">נקודת מוצא</label>
         <select class="filter-input" id="f-origin">
           <option value="">כל הנקודות</option>
-          <option value="TLV">תל אביב (TLV)</option>
-          <option value="ETM">אילת (ETM)</option>
         </select>
       </div>
       <div class="filter-group">
@@ -1164,6 +1162,12 @@
           <option value="0">ישיר בלבד</option>
           <option value="1">עד עצירה אחת</option>
           <option value="2">עד שתי עצירות</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">תאריך טיסה</label>
+        <select class="filter-input" id="f-date">
+          <option value="">כל התאריכים</option>
         </select>
       </div>
       <div class="filter-group">
@@ -1252,9 +1256,129 @@
 </div>
 
 <script>
-const AIRLINES_DATA = {"QR":{"name":"Qatar Airways","quality_score":10,"is_low_cost":false},"SQ":{"name":"Singapore Airlines","quality_score":9.8,"is_low_cost":false},"EK":{"name":"Emirates","quality_score":9.6,"is_low_cost":false},"NH":{"name":"ANA All Nippon Airways","quality_score":9.5,"is_low_cost":false},"CX":{"name":"Cathay Pacific","quality_score":9.4,"is_low_cost":false},"JL":{"name":"Japan Airlines","quality_score":9.3,"is_low_cost":false},"TK":{"name":"Turkish Airlines","quality_score":9,"is_low_cost":false},"BR":{"name":"EVA Air","quality_score":8.9,"is_low_cost":false},"AF":{"name":"Air France","quality_score":8.8,"is_low_cost":false},"LX":{"name":"Swiss International Air Lines","quality_score":8.7,"is_low_cost":false},"LY":{"name":"El Al","quality_score":7,"is_low_cost":false},"EK":{"name":"Emirates","quality_score":9.6,"is_low_cost":false},"U2":{"name":"EasyJet","quality_score":6.5,"is_low_cost":true},"FR":{"name":"Ryanair","quality_score":4.5,"is_low_cost":true},"W6":{"name":"Wizz Air","quality_score":4.5,"is_low_cost":true},"IZ":{"name":"Arkia","quality_score":6,"is_low_cost":true},"6H":{"name":"Israir","quality_score":5.8,"is_low_cost":true},"KE":{"name":"Korean Air","quality_score":8.6,"is_low_cost":false},"BA":{"name":"British Airways","quality_score":8.4,"is_low_cost":false},"DL":{"name":"Delta Air Lines","quality_score":8.3,"is_low_cost":false},"LH":{"name":"Lufthansa","quality_score":8.2,"is_low_cost":false},"KL":{"name":"KLM Royal Dutch Airlines","quality_score":8.1,"is_low_cost":false},"EY":{"name":"Etihad Airways","quality_score":8.1,"is_low_cost":false}};
+const AIRLINES_DATA = {
+  "QR":{"name":"Qatar Airways","quality_score":10,"is_low_cost":false},
+  "SQ":{"name":"Singapore Airlines","quality_score":9.8,"is_low_cost":false},
+  "EK":{"name":"Emirates","quality_score":9.6,"is_low_cost":false},
+  "NH":{"name":"ANA All Nippon Airways","quality_score":9.5,"is_low_cost":false},
+  "CX":{"name":"Cathay Pacific","quality_score":9.4,"is_low_cost":false},
+  "JL":{"name":"Japan Airlines","quality_score":9.3,"is_low_cost":false},
+  "TK":{"name":"Turkish Airlines","quality_score":9,"is_low_cost":false},
+  "BR":{"name":"EVA Air","quality_score":8.9,"is_low_cost":false},
+  "AF":{"name":"Air France","quality_score":8.8,"is_low_cost":false},
+  "LX":{"name":"Swiss International","quality_score":8.7,"is_low_cost":false},
+  "KE":{"name":"Korean Air","quality_score":8.6,"is_low_cost":false},
+  "BA":{"name":"British Airways","quality_score":8.4,"is_low_cost":false},
+  "DL":{"name":"Delta Air Lines","quality_score":8.3,"is_low_cost":false},
+  "LH":{"name":"Lufthansa","quality_score":8.2,"is_low_cost":false},
+  "KL":{"name":"KLM","quality_score":8.1,"is_low_cost":false},
+  "EY":{"name":"Etihad Airways","quality_score":8.1,"is_low_cost":false},
+  "AC":{"name":"Air Canada","quality_score":8,"is_low_cost":false},
+  "UA":{"name":"United Airlines","quality_score":7.8,"is_low_cost":false},
+  "AA":{"name":"American Airlines","quality_score":7.7,"is_low_cost":false},
+  "QF":{"name":"Qantas","quality_score":8.5,"is_low_cost":false},
+  "NZ":{"name":"Air New Zealand","quality_score":8.4,"is_low_cost":false},
+  "ET":{"name":"Ethiopian Airlines","quality_score":7.5,"is_low_cost":false},
+  "SA":{"name":"South African Airways","quality_score":7,"is_low_cost":false},
+  "MS":{"name":"EgyptAir","quality_score":6.8,"is_low_cost":false},
+  "RJ":{"name":"Royal Jordanian","quality_score":7.2,"is_low_cost":false},
+  "GF":{"name":"Gulf Air","quality_score":7.4,"is_low_cost":false},
+  "MH":{"name":"Malaysia Airlines","quality_score":7.8,"is_low_cost":false},
+  "AI":{"name":"Air India","quality_score":6.5,"is_low_cost":false},
+  "CA":{"name":"Air China","quality_score":7.2,"is_low_cost":false},
+  "MU":{"name":"China Eastern","quality_score":7,"is_low_cost":false},
+  "LY":{"name":"El Al","quality_score":7,"is_low_cost":false},
+  "IB":{"name":"Iberia","quality_score":7.6,"is_low_cost":false},
+  "AZ":{"name":"ITA Airways","quality_score":7.3,"is_low_cost":false},
+  "SK":{"name":"SAS","quality_score":7.5,"is_low_cost":false},
+  "AY":{"name":"Finnair","quality_score":7.8,"is_low_cost":false},
+  "OS":{"name":"Austrian Airlines","quality_score":7.6,"is_low_cost":false},
+  "TP":{"name":"TAP Portugal","quality_score":7.4,"is_low_cost":false},
+  "U2":{"name":"EasyJet","quality_score":6.5,"is_low_cost":true},
+  "FR":{"name":"Ryanair","quality_score":4.5,"is_low_cost":true},
+  "W6":{"name":"Wizz Air","quality_score":4.5,"is_low_cost":true},
+  "IZ":{"name":"Arkia","quality_score":6,"is_low_cost":true},
+  "6H":{"name":"Israir","quality_score":5.8,"is_low_cost":true},
+  "VY":{"name":"Vueling","quality_score":6.2,"is_low_cost":true},
+  "WS":{"name":"WestJet","quality_score":7,"is_low_cost":true},
+  "B6":{"name":"JetBlue","quality_score":7.2,"is_low_cost":true},
+  "G3":{"name":"Gol","quality_score":6,"is_low_cost":true}
+};
 
-const AIRPORTS = {"TLV":{"name":"Ben Gurion International Airport","latitude":32.011398,"longitude":34.8867,"country":"IL","city":"Tel Aviv"},"ETM":{"name":"Ramon International Airport","latitude":29.727009,"longitude":35.014116,"country":"IL","city":"Eilat"},"LHR":{"name":"London Heathrow","latitude":51.470748,"longitude":-0.459909,"country":"GB","city":"London"},"CDG":{"name":"Charles de Gaulle","latitude":49.00896,"longitude":2.554117,"country":"FR","city":"Paris"},"JFK":{"name":"John F. Kennedy","latitude":40.639447,"longitude":-73.779317,"country":"US","city":"New York"},"DXB":{"name":"Dubai International","latitude":25.24979,"longitude":55.370992,"country":"AE","city":"Dubai"},"DOH":{"name":"Hamad International","latitude":25.273056,"longitude":51.608056,"country":"QA","city":"Doha"},"FRA":{"name":"Frankfurt Main","latitude":50.026706,"longitude":8.55835,"country":"DE","city":"Frankfurt"},"AMS":{"name":"Amsterdam Schiphol","latitude":52.308601,"longitude":4.76389,"country":"NL","city":"Amsterdam"},"IST":{"name":"Istanbul Airport","latitude":41.274874,"longitude":28.732136,"country":"TR","city":"Istanbul"},"BKK":{"name":"Suvarnabhumi","latitude":13.6811,"longitude":100.747002,"country":"TH","city":"Bangkok"},"NRT":{"name":"Narita International","latitude":35.76858,"longitude":140.388714,"country":"JP","city":"Tokyo"},"SIN":{"name":"Singapore Changi","latitude":1.35019,"longitude":103.994003,"country":"SG","city":"Singapore"},"FCO":{"name":"Rome Fiumicino","latitude":41.804532,"longitude":12.251998,"country":"IT","city":"Rome"},"BCN":{"name":"Barcelona El Prat","latitude":41.2971,"longitude":2.07846,"country":"ES","city":"Barcelona"},"MUC":{"name":"Munich Airport","latitude":48.353802,"longitude":11.7861,"country":"DE","city":"Munich"},"MAD":{"name":"Madrid Barajas","latitude":40.493407,"longitude":-3.572249,"country":"ES","city":"Madrid"},"ZRH":{"name":"Zurich Airport","latitude":47.458056,"longitude":8.548056,"country":"CH","city":"Zurich"},"VIE":{"name":"Vienna International","latitude":48.110298,"longitude":16.5697,"country":"AT","city":"Vienna"},"ATH":{"name":"Athens Eleftherios Venizelos","latitude":37.936401,"longitude":23.9445,"country":"GR","city":"Athens"},"LAX":{"name":"Los Angeles International","latitude":33.942501,"longitude":-118.407997,"country":"US","city":"Los Angeles"},"ORD":{"name":"Chicago O'Hare","latitude":41.9786,"longitude":-87.9048,"country":"US","city":"Chicago"},"BOS":{"name":"Boston Logan","latitude":42.36197,"longitude":-71.0079,"country":"US","city":"Boston"},"EWR":{"name":"Newark Liberty","latitude":40.6894,"longitude":-74.170545,"country":"US","city":"New York"},"MIA":{"name":"Miami International","latitude":25.796011,"longitude":-80.289751,"country":"US","city":"Miami"},"HKG":{"name":"Hong Kong International","latitude":22.31184,"longitude":113.914862,"country":"HK","city":"Hong Kong"},"SYD":{"name":"Sydney Kingsford Smith","latitude":-33.946098,"longitude":151.177002,"country":"AU","city":"Sydney"},"GRU":{"name":"São Paulo Guarulhos","latitude":-23.431274,"longitude":-46.469954,"country":"BR","city":"São Paulo"}};
+const AIRPORTS = {
+  // Middle East / Israel
+  "TLV":{"name":"Ben Gurion International","latitude":32.011398,"longitude":34.8867,"country":"IL","city":"Tel Aviv","region":"Middle East"},
+  "ETM":{"name":"Ramon International","latitude":29.727009,"longitude":35.014116,"country":"IL","city":"Eilat","region":"Middle East"},
+  "DXB":{"name":"Dubai International","latitude":25.24979,"longitude":55.370992,"country":"AE","city":"Dubai","region":"Middle East"},
+  "DOH":{"name":"Hamad International","latitude":25.273056,"longitude":51.608056,"country":"QA","city":"Doha","region":"Middle East"},
+  "AUH":{"name":"Abu Dhabi International","latitude":24.4330,"longitude":54.6511,"country":"AE","city":"Abu Dhabi","region":"Middle East"},
+  "RUH":{"name":"King Khalid International","latitude":24.9578,"longitude":46.6989,"country":"SA","city":"Riyadh","region":"Middle East"},
+  "JED":{"name":"King Abdulaziz International","latitude":21.6796,"longitude":39.1565,"country":"SA","city":"Jeddah","region":"Middle East"},
+  "AMM":{"name":"Queen Alia International","latitude":31.7226,"longitude":35.9932,"country":"JO","city":"Amman","region":"Middle East"},
+  "BEY":{"name":"Beirut Rafic Hariri","latitude":33.8209,"longitude":35.4884,"country":"LB","city":"Beirut","region":"Middle East"},
+  "CAI":{"name":"Cairo International","latitude":30.1219,"longitude":31.4056,"country":"EG","city":"Cairo","region":"Middle East"},
+  // Europe
+  "LHR":{"name":"London Heathrow","latitude":51.470748,"longitude":-0.459909,"country":"GB","city":"London","region":"Europe"},
+  "LGW":{"name":"London Gatwick","latitude":51.1537,"longitude":-0.1821,"country":"GB","city":"London","region":"Europe"},
+  "CDG":{"name":"Charles de Gaulle","latitude":49.00896,"longitude":2.554117,"country":"FR","city":"Paris","region":"Europe"},
+  "FRA":{"name":"Frankfurt Main","latitude":50.026706,"longitude":8.55835,"country":"DE","city":"Frankfurt","region":"Europe"},
+  "AMS":{"name":"Amsterdam Schiphol","latitude":52.308601,"longitude":4.76389,"country":"NL","city":"Amsterdam","region":"Europe"},
+  "IST":{"name":"Istanbul Airport","latitude":41.274874,"longitude":28.732136,"country":"TR","city":"Istanbul","region":"Europe"},
+  "FCO":{"name":"Rome Fiumicino","latitude":41.804532,"longitude":12.251998,"country":"IT","city":"Rome","region":"Europe"},
+  "BCN":{"name":"Barcelona El Prat","latitude":41.2971,"longitude":2.07846,"country":"ES","city":"Barcelona","region":"Europe"},
+  "MAD":{"name":"Madrid Barajas","latitude":40.493407,"longitude":-3.572249,"country":"ES","city":"Madrid","region":"Europe"},
+  "MUC":{"name":"Munich Airport","latitude":48.353802,"longitude":11.7861,"country":"DE","city":"Munich","region":"Europe"},
+  "ZRH":{"name":"Zurich Airport","latitude":47.458056,"longitude":8.548056,"country":"CH","city":"Zurich","region":"Europe"},
+  "VIE":{"name":"Vienna International","latitude":48.110298,"longitude":16.5697,"country":"AT","city":"Vienna","region":"Europe"},
+  "ATH":{"name":"Athens International","latitude":37.936401,"longitude":23.9445,"country":"GR","city":"Athens","region":"Europe"},
+  "CPH":{"name":"Copenhagen Airport","latitude":55.6179,"longitude":12.6560,"country":"DK","city":"Copenhagen","region":"Europe"},
+  "ARN":{"name":"Stockholm Arlanda","latitude":59.6519,"longitude":17.9186,"country":"SE","city":"Stockholm","region":"Europe"},
+  "HEL":{"name":"Helsinki Airport","latitude":60.3172,"longitude":24.9633,"country":"FI","city":"Helsinki","region":"Europe"},
+  "LIS":{"name":"Lisbon Airport","latitude":38.7813,"longitude":-9.1359,"country":"PT","city":"Lisbon","region":"Europe"},
+  "BRU":{"name":"Brussels Airport","latitude":50.9014,"longitude":4.4844,"country":"BE","city":"Brussels","region":"Europe"},
+  "WAW":{"name":"Warsaw Chopin","latitude":52.1657,"longitude":20.9671,"country":"PL","city":"Warsaw","region":"Europe"},
+  "PRG":{"name":"Prague Václav Havel","latitude":50.1008,"longitude":14.2600,"country":"CZ","city":"Prague","region":"Europe"},
+  "BUD":{"name":"Budapest Ferenc Liszt","latitude":47.4298,"longitude":19.2611,"country":"HU","city":"Budapest","region":"Europe"},
+  // North America
+  "JFK":{"name":"John F. Kennedy","latitude":40.639447,"longitude":-73.779317,"country":"US","city":"New York","region":"Americas"},
+  "EWR":{"name":"Newark Liberty","latitude":40.6894,"longitude":-74.170545,"country":"US","city":"New York","region":"Americas"},
+  "LAX":{"name":"Los Angeles International","latitude":33.942501,"longitude":-118.407997,"country":"US","city":"Los Angeles","region":"Americas"},
+  "ORD":{"name":"Chicago O'Hare","latitude":41.9786,"longitude":-87.9048,"country":"US","city":"Chicago","region":"Americas"},
+  "MIA":{"name":"Miami International","latitude":25.796011,"longitude":-80.289751,"country":"US","city":"Miami","region":"Americas"},
+  "BOS":{"name":"Boston Logan","latitude":42.36197,"longitude":-71.0079,"country":"US","city":"Boston","region":"Americas"},
+  "SFO":{"name":"San Francisco International","latitude":37.6213,"longitude":-122.3790,"country":"US","city":"San Francisco","region":"Americas"},
+  "YYZ":{"name":"Toronto Pearson","latitude":43.6777,"longitude":-79.6248,"country":"CA","city":"Toronto","region":"Americas"},
+  "YVR":{"name":"Vancouver International","latitude":49.1947,"longitude":-123.1792,"country":"CA","city":"Vancouver","region":"Americas"},
+  "MEX":{"name":"Mexico City International","latitude":19.4363,"longitude":-99.0721,"country":"MX","city":"Mexico City","region":"Americas"},
+  // South America
+  "GRU":{"name":"São Paulo Guarulhos","latitude":-23.431274,"longitude":-46.469954,"country":"BR","city":"São Paulo","region":"Americas"},
+  "EZE":{"name":"Buenos Aires Ezeiza","latitude":-34.8222,"longitude":-58.5358,"country":"AR","city":"Buenos Aires","region":"Americas"},
+  "BOG":{"name":"Bogotá El Dorado","latitude":4.7016,"longitude":-74.1469,"country":"CO","city":"Bogotá","region":"Americas"},
+  "SCL":{"name":"Santiago de Chile","latitude":-33.3930,"longitude":-70.7858,"country":"CL","city":"Santiago","region":"Americas"},
+  // Asia
+  "NRT":{"name":"Tokyo Narita","latitude":35.76858,"longitude":140.388714,"country":"JP","city":"Tokyo","region":"Asia"},
+  "HND":{"name":"Tokyo Haneda","latitude":35.5494,"longitude":139.7798,"country":"JP","city":"Tokyo","region":"Asia"},
+  "ICN":{"name":"Seoul Incheon","latitude":37.4692,"longitude":126.4505,"country":"KR","city":"Seoul","region":"Asia"},
+  "PEK":{"name":"Beijing Capital","latitude":40.0799,"longitude":116.6031,"country":"CN","city":"Beijing","region":"Asia"},
+  "PVG":{"name":"Shanghai Pudong","latitude":31.1443,"longitude":121.8083,"country":"CN","city":"Shanghai","region":"Asia"},
+  "HKG":{"name":"Hong Kong International","latitude":22.31184,"longitude":113.914862,"country":"HK","city":"Hong Kong","region":"Asia"},
+  "SIN":{"name":"Singapore Changi","latitude":1.35019,"longitude":103.994003,"country":"SG","city":"Singapore","region":"Asia"},
+  "BKK":{"name":"Bangkok Suvarnabhumi","latitude":13.6811,"longitude":100.747002,"country":"TH","city":"Bangkok","region":"Asia"},
+  "KUL":{"name":"Kuala Lumpur International","latitude":2.7456,"longitude":101.7099,"country":"MY","city":"Kuala Lumpur","region":"Asia"},
+  "DEL":{"name":"Delhi Indira Gandhi","latitude":28.5665,"longitude":77.1031,"country":"IN","city":"Delhi","region":"Asia"},
+  "BOM":{"name":"Mumbai Chhatrapati Shivaji","latitude":19.0887,"longitude":72.8679,"country":"IN","city":"Mumbai","region":"Asia"},
+  "CGK":{"name":"Jakarta Soekarno-Hatta","latitude":-6.1256,"longitude":106.6559,"country":"ID","city":"Jakarta","region":"Asia"},
+  // Africa
+  "JNB":{"name":"Johannesburg O.R. Tambo","latitude":-26.1392,"longitude":28.2460,"country":"ZA","city":"Johannesburg","region":"Africa"},
+  "CPT":{"name":"Cape Town International","latitude":-33.9648,"longitude":18.6017,"country":"ZA","city":"Cape Town","region":"Africa"},
+  "NBO":{"name":"Nairobi Jomo Kenyatta","latitude":-1.3192,"longitude":36.9275,"country":"KE","city":"Nairobi","region":"Africa"},
+  "ADD":{"name":"Addis Ababa Bole","latitude":8.9779,"longitude":38.7993,"country":"ET","city":"Addis Ababa","region":"Africa"},
+  "CMN":{"name":"Casablanca Mohammed V","latitude":33.3675,"longitude":-7.5898,"country":"MA","city":"Casablanca","region":"Africa"},
+  // Oceania
+  "SYD":{"name":"Sydney Kingsford Smith","latitude":-33.946098,"longitude":151.177002,"country":"AU","city":"Sydney","region":"Oceania"},
+  "MEL":{"name":"Melbourne Airport","latitude":-37.6733,"longitude":144.8430,"country":"AU","city":"Melbourne","region":"Oceania"},
+  "AKL":{"name":"Auckland International","latitude":-37.0082,"longitude":174.7850,"country":"NZ","city":"Auckland","region":"Oceania"}
+};
 
 let allFlights = [];
 
@@ -1353,10 +1477,11 @@ function setSortMode(mode) {
 
 function generateMockFlights() {
   const routes = [
+    // From TLV
     {from:'TLV',to:'LHR',airlines:['LY','BA','EK'],stops:[0,1],prices:[320,450,890,230,670]},
     {from:'TLV',to:'CDG',airlines:['LY','AF','TK'],stops:[0,0,1],prices:[280,350,520,190,440]},
     {from:'TLV',to:'JFK',airlines:['LY','EK','EY'],stops:[0,1,1],prices:[650,890,1100,540,750]},
-    {from:'TLV',to:'DXB',airlines:['EK','LY','FZ'],stops:[0,0,1],prices:[350,420,180,560,290]},
+    {from:'TLV',to:'DXB',airlines:['EK','LY'],stops:[0,0],prices:[350,420,180,560,290]},
     {from:'TLV',to:'DOH',airlines:['QR','LY'],stops:[0,0],prices:[380,290,470]},
     {from:'TLV',to:'FRA',airlines:['LH','LY','W6'],stops:[0,0,1],prices:[220,310,85,400]},
     {from:'TLV',to:'AMS',airlines:['KL','LY'],stops:[0,0],prices:[260,380,199]},
@@ -1364,12 +1489,83 @@ function generateMockFlights() {
     {from:'TLV',to:'BKK',airlines:['EK','QR','TK'],stops:[1,1,1],prices:[580,720,620]},
     {from:'TLV',to:'NRT',airlines:['EK','QR','SQ'],stops:[1,1,1],prices:[980,850,920]},
     {from:'TLV',to:'SIN',airlines:['SQ','EK'],stops:[1,1],prices:[820,750]},
-    {from:'TLV',to:'FCO',airlines:['LY','ITA','FR'],stops:[0,0,1],prices:[195,260,75,320]},
+    {from:'TLV',to:'FCO',airlines:['LY','AZ','FR'],stops:[0,0,1],prices:[195,260,75,320]},
     {from:'TLV',to:'BCN',airlines:['LY','VY','U2'],stops:[0,1,1],prices:[210,145,310,95]},
-    {from:'TLV',to:'MUC',airlines:['LH','LY'],stops:[0,0],prices:[245,310,190]},
-    {from:'TLV',to:'ATH',airlines:['A3','LY','FR'],stops:[0,0,0],prices:[145,195,79,260]},
+    {from:'TLV',to:'ATH',airlines:['LY','FR'],stops:[0,0],prices:[145,195,79,260]},
     {from:'TLV',to:'LAX',airlines:['EK','LY'],stops:[1,1],prices:[880,1100,760]},
     {from:'TLV',to:'ZRH',airlines:['LX','LY'],stops:[0,0],prices:[285,340]},
+    {from:'TLV',to:'CAI',airlines:['MS','LY'],stops:[0,0],prices:[110,150,90]},
+    {from:'TLV',to:'JNB',airlines:['ET','EK'],stops:[1,1],prices:[720,850,650]},
+    // From LHR (London)
+    {from:'LHR',to:'JFK',airlines:['BA','AA','VS'],stops:[0,0,0],prices:[480,520,440,680]},
+    {from:'LHR',to:'DXB',airlines:['BA','EK'],stops:[0,0],prices:[350,420,290]},
+    {from:'LHR',to:'SIN',airlines:['BA','SQ'],stops:[0,1],prices:[620,580,750]},
+    {from:'LHR',to:'NRT',airlines:['BA','NH','JL'],stops:[0,1,0],prices:[680,720,640]},
+    {from:'LHR',to:'SYD',airlines:['QF','BA'],stops:[1,1],prices:[980,1100,860]},
+    {from:'LHR',to:'LAX',airlines:['BA','AA','UA'],stops:[0,0,0],prices:[420,390,460]},
+    {from:'LHR',to:'CDG',airlines:['BA','AF','U2'],stops:[0,0,0],prices:[120,140,65,95]},
+    // From JFK (New York)
+    {from:'JFK',to:'LHR',airlines:['BA','AA','VS'],stops:[0,0,0],prices:[490,510,450]},
+    {from:'JFK',to:'CDG',airlines:['AF','DL','AA'],stops:[0,0,1],prices:[520,480,560]},
+    {from:'JFK',to:'LAX',airlines:['DL','AA','UA','B6'],stops:[0,0,0,0],prices:[180,160,200,140]},
+    {from:'JFK',to:'NRT',airlines:['DL','UA','NH'],stops:[0,1,1],prices:[820,750,880]},
+    {from:'JFK',to:'GRU',airlines:['AA','DL'],stops:[0,1],prices:[580,650,520]},
+    {from:'JFK',to:'DXB',airlines:['EK'],stops:[0],prices:[780,850,720]},
+    // From DXB (Dubai)
+    {from:'DXB',to:'LHR',airlines:['EK','BA'],stops:[0,0],prices:[380,420,310]},
+    {from:'DXB',to:'SIN',airlines:['EK','SQ'],stops:[0,0],prices:[290,340,260]},
+    {from:'DXB',to:'BKK',airlines:['EK','TK'],stops:[0,1],prices:[250,310,220]},
+    {from:'DXB',to:'NRT',airlines:['EK'],stops:[0],prices:[580,650,520]},
+    {from:'DXB',to:'SYD',airlines:['EK','QF'],stops:[0,1],prices:[620,720,560]},
+    {from:'DXB',to:'JFK',airlines:['EK'],stops:[0],prices:[780,850,720]},
+    {from:'DXB',to:'JNB',airlines:['EK','SA'],stops:[0,1],prices:[480,550,420]},
+    // From SIN (Singapore)
+    {from:'SIN',to:'LHR',airlines:['SQ','BA'],stops:[0,1],prices:[580,650,520]},
+    {from:'SIN',to:'NRT',airlines:['SQ','NH'],stops:[0,0],prices:[320,380,280]},
+    {from:'SIN',to:'SYD',airlines:['SQ','QF'],stops:[0,0],prices:[280,340,240]},
+    {from:'SIN',to:'HKG',airlines:['SQ','CX'],stops:[0,0],prices:[180,210,160]},
+    {from:'SIN',to:'BKK',airlines:['SQ','TG'],stops:[0,0],prices:[140,170,120]},
+    // From CDG (Paris)
+    {from:'CDG',to:'JFK',airlines:['AF','DL','AA'],stops:[0,0,1],prices:[510,480,560]},
+    {from:'CDG',to:'DXB',airlines:['AF','EK'],stops:[0,0],prices:[340,390,280]},
+    {from:'CDG',to:'NRT',airlines:['AF','JL'],stops:[0,1],prices:[680,720,610]},
+    {from:'CDG',to:'GRU',airlines:['AF'],stops:[0],prices:[620,710,560]},
+    // From NRT (Tokyo)
+    {from:'NRT',to:'LAX',airlines:['NH','JL','UA'],stops:[0,0,0],prices:[680,720,640]},
+    {from:'NRT',to:'LHR',airlines:['NH','BA','JL'],stops:[0,1,0],prices:[720,680,760]},
+    {from:'NRT',to:'SIN',airlines:['NH','SQ'],stops:[0,0],prices:[320,280,360]},
+    {from:'NRT',to:'SYD',airlines:['JL','QF'],stops:[0,1],prices:[560,620,500]},
+    // From SYD (Sydney)
+    {from:'SYD',to:'LHR',airlines:['QF','BA'],stops:[1,1],prices:[980,1100,860]},
+    {from:'SYD',to:'SIN',airlines:['QF','SQ'],stops:[0,0],prices:[280,320,240]},
+    {from:'SYD',to:'LAX',airlines:['QF','UA'],stops:[0,1],prices:[720,800,640]},
+    {from:'SYD',to:'AKL',airlines:['QF','NZ'],stops:[0,0],prices:[180,220,150]},
+    // From LAX
+    {from:'LAX',to:'NRT',airlines:['UA','NH','JL'],stops:[0,0,0],prices:[680,640,720]},
+    {from:'LAX',to:'SYD',airlines:['QF','UA'],stops:[0,1],prices:[720,800,640]},
+    {from:'LAX',to:'LHR',airlines:['AA','BA','UA'],stops:[0,0,0],prices:[420,460,390]},
+    // From IST (Istanbul)
+    {from:'IST',to:'JFK',airlines:['TK'],stops:[0],prices:[580,650,520]},
+    {from:'IST',to:'DXB',airlines:['TK','EK'],stops:[0,0],prices:[220,280,190]},
+    {from:'IST',to:'BKK',airlines:['TK'],stops:[0],prices:[420,490,370]},
+    {from:'IST',to:'NBO',airlines:['TK','ET'],stops:[0,1],prices:[380,450,320]},
+    // From JNB (Johannesburg)
+    {from:'JNB',to:'LHR',airlines:['SA','BA'],stops:[0,1],prices:[680,780,580]},
+    {from:'JNB',to:'DXB',airlines:['EK','SA'],stops:[0,1],prices:[480,560,420]},
+    {from:'JNB',to:'NBO',airlines:['SA','ET'],stops:[0,0],prices:[180,220,150]},
+    {from:'JNB',to:'ADD',airlines:['ET'],stops:[0],prices:[160,200,130]},
+    // From ADD (Addis Ababa)
+    {from:'ADD',to:'LHR',airlines:['ET'],stops:[0],prices:[520,620,450]},
+    {from:'ADD',to:'JFK',airlines:['ET'],stops:[0],prices:[680,780,590]},
+    {from:'ADD',to:'NRT',airlines:['ET'],stops:[1],prices:[780,880,680]},
+    // From GRU (São Paulo)
+    {from:'GRU',to:'LHR',airlines:['BA','LATAM'],stops:[1,1],prices:[780,850,700]},
+    {from:'GRU',to:'JFK',airlines:['AA','DL'],stops:[0,1],prices:[580,650,510]},
+    {from:'GRU',to:'EZE',airlines:['G3','LA'],stops:[0,0],prices:[120,150,95]},
+    // From YYZ (Toronto)
+    {from:'YYZ',to:'LHR',airlines:['AC','BA'],stops:[0,0],prices:[480,560,420]},
+    {from:'YYZ',to:'CDG',airlines:['AC','AF'],stops:[0,0],prices:[500,580,440]},
+    {from:'YYZ',to:'DXB',airlines:['EK','AC'],stops:[0,1],prices:[620,720,560]},
   ];
 
   const flights = [];
@@ -1414,14 +1610,16 @@ function generateMockFlights() {
 }
 
 function calcBaseDuration(from, to) {
-  const DURATIONS = {
-    'TLV-LHR': 270, 'TLV-CDG': 255, 'TLV-JFK': 660, 'TLV-DXB': 210,
-    'TLV-DOH': 195, 'TLV-FRA': 240, 'TLV-AMS': 255, 'TLV-IST': 155,
-    'TLV-BKK': 620, 'TLV-NRT': 720, 'TLV-SIN': 620, 'TLV-FCO': 215,
-    'TLV-BCN': 260, 'TLV-MUC': 240, 'TLV-ATH': 140, 'TLV-LAX': 780,
-    'TLV-ZRH': 240,
-  };
-  return DURATIONS[`${from}-${to}`] || 300;
+  const a = AIRPORTS[from], b = AIRPORTS[to];
+  if (!a || !b) return 300;
+  const R = 6371;
+  const lat1 = a.latitude * Math.PI / 180, lat2 = b.latitude * Math.PI / 180;
+  const dLat = (b.latitude - a.latitude) * Math.PI / 180;
+  const dLon = (b.longitude - a.longitude) * Math.PI / 180;
+  const h = Math.sin(dLat/2)**2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon/2)**2;
+  const distKm = R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1-h));
+  // ~900 km/h cruise + 30 min taxi/takeoff/landing overhead
+  return Math.round(distKm / 900 * 60 + 30);
 }
 
 function computeScores(flights) {
@@ -1494,18 +1692,20 @@ function computeScores(flights) {
 }
 
 function filterFlights(flights) {
-  const origin = document.getElementById('f-origin').value;
-  const dest = document.getElementById('f-dest').value;
-  const airline = document.getElementById('f-airline').value;
+  const date     = document.getElementById('f-date').value;
+  const origin   = document.getElementById('f-origin').value;
+  const dest     = document.getElementById('f-dest').value;
+  const airline  = document.getElementById('f-airline').value;
   const maxStops = +document.getElementById('f-stops').value;
   const maxPrice = +document.getElementById('f-maxprice').value || Infinity;
 
   return flights.filter(f => {
-    if (origin && f.from !== origin) return false;
-    if (dest && f.to !== dest) return false;
-    if (airline && f.airlineCode !== airline) return false;
-    if (maxStops >= 0 && f.stops > maxStops) return false;
-    if (f.price > maxPrice) return false;
+    if (date     && f.date !== date)              return false;
+    if (origin   && f.from !== origin)            return false;
+    if (dest     && f.to   !== dest)              return false;
+    if (airline  && f.airlineCode !== airline)    return false;
+    if (maxStops >= 0 && f.stops > maxStops)      return false;
+    if (f.price > maxPrice)                       return false;
     if (filterDeals && f.anomalyType !== 'high' && f.anomalyType !== 'medium') return false;
     return true;
   });
@@ -1659,39 +1859,124 @@ function rerankAndDisplay() {
   renderFlights(sorted);
 }
 
+// ── Airline name → IATA code ─────────────────────────────────────
+const AIRLINE_NAME_MAP = {};
+Object.entries(AIRLINES_DATA).forEach(([code, data]) => {
+  AIRLINE_NAME_MAP[data.name.toLowerCase()] = code;
+});
+
+function resolveAirlineCode(name) {
+  if (!name) return 'XX';
+  const lower = name.toLowerCase();
+  if (AIRLINE_NAME_MAP[lower]) return AIRLINE_NAME_MAP[lower];
+  const firstWord = lower.split(' ')[0];
+  for (const [n, code] of Object.entries(AIRLINE_NAME_MAP)) {
+    if (n.includes(firstWord) || (firstWord.length > 3 && lower.includes(n.split(' ')[0]))) return code;
+  }
+  return 'XX';
+}
+
+// ── Load from flights.json (generated by fetch_flights.js) ───────
+let availableDates = [];
+
+async function loadFlightsJSON() {
+  const res = await fetch('flights.json');
+  if (!res.ok) throw new Error('flights.json not found');
+  return res.json();
+}
+
+function enrichFlight(f) {
+  const airlineCode = resolveAirlineCode(f.airlineName);
+  const airline = AIRLINES_DATA[airlineCode] || { name: f.airlineName, quality_score: 7, is_low_cost: false };
+  const hour = f.departureTime ? new Date(f.departureTime).getHours() : 8;
+  return {
+    ...f,
+    fromCity:     AIRPORTS[f.from]?.city || f.from,
+    toCity:       AIRPORTS[f.to]?.city   || f.to,
+    airlineCode,
+    airlineName:  f.airlineName || airline.name,
+    qualityScore: airline.quality_score,
+    isLowCost:    airline.is_low_cost,
+    departureHour: isNaN(hour) ? 8 : hour,
+  };
+}
+
+function populateDatePicker(dates) {
+  availableDates = dates;
+  const el = document.getElementById('f-date');
+  el.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
+  el.value = dates[0] || '';
+}
+
 async function searchFlights() {
   const btn = document.getElementById('search-btn');
   btn.disabled = true;
-  btn.textContent = '🔄 מחפש...';
-
+  btn.textContent = '🔄 טוען...';
   document.getElementById('loading-state').classList.add('visible');
   document.getElementById('flights-grid').innerHTML = '';
   document.getElementById('empty-state').style.display = 'none';
 
-  await new Promise(r => setTimeout(r, 800));
+  try {
+    const data = await loadFlightsJSON();
 
-  allFlights = generateMockFlights();
+    // Populate date picker from JSON on first load
+    if (availableDates.length === 0 && data.dates) {
+      populateDatePicker(data.dates);
+    }
+
+    const selectedDate = document.getElementById('f-date').value;
+    const raw = data.flights.filter(f => !selectedDate || f.date === selectedDate);
+    allFlights = raw.map(enrichFlight);
+
+    document.getElementById('api-status').textContent =
+      `✓ נתונים מ-${data.fetched_at?.slice(0,10) || '?'} · ${allFlights.length} טיסות`;
+  } catch (e) {
+    // Fallback: mock data
+    allFlights = generateMockFlights();
+    document.getElementById('api-status').textContent = '⚠ נתוני דמו (flights.json לא נמצא)';
+  }
+
   populateFilters(allFlights);
-
   document.getElementById('loading-state').classList.remove('visible');
-  document.getElementById('api-status').textContent = `עודכן ${new Date().toLocaleTimeString('he-IL')}`;
   document.getElementById('results-count').textContent = `${allFlights.length} טיסות נמצאו`;
-
   btn.disabled = false;
   btn.textContent = '🔍 חפש ודרג טיסות';
-
   rerankAndDisplay();
 }
 
 function populateFilters(flights) {
+  const originSet = new Set(flights.map(f => f.from));
   const destSet = new Set(flights.map(f => f.to));
   const airlineSet = new Set(flights.map(f => f.airlineCode));
 
+  // Group airports by region for origin dropdown
+  const regionOrder = ['Middle East','Europe','Americas','Asia','Africa','Oceania'];
+  const originSel = document.getElementById('f-origin');
+  originSel.innerHTML = '<option value="">כל הנקודות</option>';
+  regionOrder.forEach(region => {
+    const codes = [...originSet].filter(c => AIRPORTS[c]?.region === region).sort((a,b) => AIRPORTS[a].city.localeCompare(AIRPORTS[b].city));
+    if (codes.length === 0) return;
+    const grp = document.createElement('optgroup');
+    grp.label = region;
+    codes.forEach(code => {
+      const ap = AIRPORTS[code];
+      grp.innerHTML += `<option value="${code}">${ap.city} (${code})</option>`;
+    });
+    originSel.appendChild(grp);
+  });
+
   const destSel = document.getElementById('f-dest');
   destSel.innerHTML = '<option value="">כל היעדים</option>';
-  [...destSet].sort().forEach(code => {
-    const ap = AIRPORTS[code];
-    destSel.innerHTML += `<option value="${code}">${ap ? ap.city : code} (${code})</option>`;
+  regionOrder.forEach(region => {
+    const codes = [...destSet].filter(c => AIRPORTS[c]?.region === region).sort((a,b) => AIRPORTS[a].city.localeCompare(AIRPORTS[b].city));
+    if (codes.length === 0) return;
+    const grp = document.createElement('optgroup');
+    grp.label = region;
+    codes.forEach(code => {
+      const ap = AIRPORTS[code];
+      grp.innerHTML += `<option value="${code}">${ap.city} (${code})</option>`;
+    });
+    destSel.appendChild(grp);
   });
 
   const airlineSel = document.getElementById('f-airline');
@@ -1701,7 +1986,7 @@ function populateFilters(flights) {
     airlineSel.innerHTML += `<option value="${code}">${al ? al.name : code}</option>`;
   });
 
-  ['f-origin','f-dest','f-airline','f-stops','f-maxprice'].forEach(id => {
+  ['f-date','f-origin','f-dest','f-airline','f-stops','f-maxprice'].forEach(id => {
     const el = document.getElementById(id);
     el.onchange = () => rerankAndDisplay();
     el.oninput = () => rerankAndDisplay();
@@ -1812,6 +2097,8 @@ function closeModal(e) {
     document.getElementById('modal-overlay').classList.remove('visible');
   }
 }
+
+// Date picker populated dynamically from flights.json
 
 updateWeightDisplay();
 searchFlights();
