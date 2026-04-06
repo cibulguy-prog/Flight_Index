@@ -1741,7 +1741,7 @@ function generateMockFlights() {
     const baseDuration = calcBaseDuration(route.from, route.to);
 
     route.airlines.forEach((airlineCode, ai) => {
-      const airline = AIRLINES_DATA[airlineCode] || {name: airlineCode, quality_score: 7, is_low_cost: false};
+      const airline = AIRLINES_DATA[airlineCode] || {name: airlineCode, quality_score: 4.5, is_low_cost: true};
       const stops = route.stops[ai % route.stops.length];
       const basePrice = route.prices[Math.floor(Math.random() * route.prices.length)];
       const priceVariation = 0.85 + Math.random() * 0.3;
@@ -1806,11 +1806,8 @@ function computeScores(flights) {
 
   const prices    = flights.map(f => f.price);
   const durations = flights.map(f => f.duration);
-  const qualities = flights.map(f => f.qualityScore);
-
   const minP = Math.min(...prices),    maxP = Math.max(...prices);
   const minD = Math.min(...durations), maxD = Math.max(...durations);
-  const minQ = Math.min(...qualities), maxQ = Math.max(...qualities);
 
   // Per-route price stats for anomaly detection
   const routeGroups = {};
@@ -1828,7 +1825,7 @@ function computeScores(flights) {
   return flights.map(f => {
     const priceScore   = maxP === minP ? 0.5 : (maxP - f.price)        / (maxP - minP);
     const rawTimeScore = maxD === minD ? 0.5 : (maxD - f.duration)     / (maxD - minD);
-    const qualityScore = maxQ === minQ ? 0.5 : (f.qualityScore - minQ) / (maxQ - minQ);
+    const qualityScore = f.qualityScore / 10;
 
     // Stop penalty embedded in time score — each stop penalizes journey experience
     const timeScore    = Math.max(0, rawTimeScore - f.stops * 0.12);
@@ -1961,8 +1958,8 @@ function renderFlights(flights) {
       <div class="fb-table">
         <div class="fb-thead">
           <div class="fb-th">Price</div>
-          <div class="fb-th">Airline Quality</div>
-          <div class="fb-th">Quality Score</div>
+          <div class="fb-th">Quality Rating</div>
+          <div class="fb-th">Flight Time</div>
           <div class="fb-th">Total Score</div>
         </div>
         <div class="fb-tbody">
@@ -1981,10 +1978,10 @@ function renderFlights(flights) {
             </div>
           </div>
           <div class="fb-td">
-            <div class="td-val" style="color:var(--purple)">${f.qualityScore_norm}</div>
+            <div class="td-val" style="color:var(--cyan)">${Math.floor(f.duration/60)}h ${f.duration%60}m</div>
             <div class="td-bar-wrap">
-              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
-              <div class="td-sub">Relative score</div>
+              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.timeScore}%;background:var(--cyan)"></div></div>
+              <div class="td-sub">${f.stops === 0 ? 'Direct' : f.stops === 1 ? '1 stop' : f.stops + ' stops'}</div>
             </div>
           </div>
           <div class="fb-td">
@@ -2326,7 +2323,7 @@ function showFlightDetail(f, rank) {
         <div class="anomaly-bar-row">
           <span class="anomaly-bar-label">Airline Quality</span>
           <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${f.qualityScore_norm}%;background:var(--purple)"></div></div>
-          <span class="anomaly-bar-sigma" style="color:var(--purple);">${f.qualityScore_norm}</span>
+          <span class="anomaly-bar-sigma" style="color:var(--purple);">${f.qualityScore}/10</span>
         </div>
         <div class="anomaly-bar-row">
           <span class="anomaly-bar-label">Price Score</span>
