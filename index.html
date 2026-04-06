@@ -878,6 +878,27 @@
     white-space: nowrap;
   }
 
+  .fb-times {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    direction: ltr;
+    unicode-bidi: isolate;
+  }
+  .fb-times .t-arr { color: var(--text2); }
+  .fb-times .t-plus {
+    font-size: 9px;
+    color: var(--amber);
+    font-weight: 700;
+    vertical-align: super;
+    line-height: 1;
+  }
+
   .fb-spacer { flex: 1; }
 
   .deal-badge {
@@ -1084,6 +1105,84 @@
   @media (min-width: 769px) {
     .sidebar { transition: width 0.25s ease, padding 0.25s ease; overflow: hidden; }
   }
+
+  /* DATE CALENDAR */
+  .cal-wrap { margin-top: 2px; }
+  .cal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .cal-nav {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.15s;
+  }
+  .cal-nav:hover { background: var(--surface3); color: var(--text); }
+  .cal-month-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; font-weight: 700;
+    color: var(--text);
+  }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .cal-dow {
+    font-size: 9px; color: var(--text3);
+    text-align: center; padding: 3px 0;
+    font-family: 'Space Mono', monospace;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; border-radius: 6px;
+    color: var(--text3);
+    position: relative;
+    transition: background 0.12s, color 0.12s;
+    cursor: default;
+  }
+  .cal-day.has-flights {
+    color: var(--text); cursor: pointer;
+    background: var(--surface2);
+  }
+  .cal-day.has-flights:hover { background: var(--surface3); }
+  .cal-day.selected {
+    background: var(--accent) !important;
+    color: #fff !important;
+    font-weight: 700;
+  }
+  .cal-day.today::after {
+    content: '';
+    position: absolute; bottom: 3px; left: 50%;
+    transform: translateX(-50%);
+    width: 3px; height: 3px;
+    border-radius: 50%; background: var(--green);
+  }
+  .cal-day.selected.today::after { background: rgba(255,255,255,0.7); }
+  .cal-clear-btn {
+    width: 100%; margin-top: 8px;
+    padding: 6px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 7px;
+    color: var(--text2); font-size: 11px;
+    font-family: 'Heebo', sans-serif;
+    cursor: pointer; transition: background 0.15s;
+    text-align: center;
+  }
+  .cal-clear-btn:hover { background: var(--surface3); color: var(--text); }
+  .cal-clear-btn.all-active {
+    background: rgba(79,124,255,0.1);
+    border-color: rgba(79,124,255,0.3);
+    color: var(--accent);
+  }
 </style>
 </head>
 <body>
@@ -1166,9 +1265,15 @@
       </div>
       <div class="filter-group">
         <label class="filter-label">תאריך טיסה</label>
-        <select class="filter-input" id="f-date">
-          <option value="">כל התאריכים</option>
-        </select>
+        <div class="cal-wrap">
+          <div class="cal-header">
+            <button class="cal-nav" onclick="calPrevMonth()">›</button>
+            <span class="cal-month-label" id="cal-month-label">—</span>
+            <button class="cal-nav" onclick="calNextMonth()">‹</button>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <button class="cal-clear-btn all-active" id="cal-clear-btn" onclick="calClearDate()">כל התאריכים</button>
+        </div>
       </div>
       <div class="filter-group">
         <label class="filter-label">מחיר מקסימאלי ($)</label>
@@ -1398,6 +1503,8 @@ let sortMode = 'score';
 let showAnomalies = true;
 let filterDeals = false;
 let statsData = {};
+let selectedDate = '';
+let calViewDate = new Date();
 
 function toggleDealFilter() {
   filterDeals = !filterDeals;
@@ -1588,6 +1695,18 @@ function generateMockFlights() {
       const stopPenalty = stops * (0.15 + Math.random() * 0.25);
       const duration = Math.round(baseDuration * (1 + stopPenalty + (Math.random() * 0.1 - 0.05)));
 
+      const depH   = Math.floor(Math.random() * 20) + 4;
+      const depM   = [0, 15, 30, 45][Math.floor(Math.random() * 4)];
+      const offset = Math.floor(Math.random() * 14);
+      const mockDate = new Date(Date.now() + offset * 86400000).toISOString().slice(0, 10);
+      const departureTime = `${mockDate}T${String(depH).padStart(2,'0')}:${String(depM).padStart(2,'0')}:00`;
+
+      const depDt  = new Date(departureTime);
+      const arrDt  = new Date(depDt.getTime() + duration * 60000);
+      const fmtT   = dt => `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+      const d1     = new Date(depDt.getFullYear(), depDt.getMonth(), depDt.getDate());
+      const d2     = new Date(arrDt.getFullYear(), arrDt.getMonth(), arrDt.getDate());
+
       flights.push({
         id: id++,
         from: route.from,
@@ -1601,7 +1720,12 @@ function generateMockFlights() {
         stops,
         price,
         duration,
-        departureHour: Math.floor(Math.random() * 20) + 4,
+        date: mockDate,
+        departureTime,
+        departureHour: depH,
+        depTime:  fmtT(depDt),
+        arrTime:  fmtT(arrDt),
+        dayDiff:  Math.round((d2 - d1) / 86400000),
       });
     });
   });
@@ -1625,74 +1749,67 @@ function calcBaseDuration(from, to) {
 function computeScores(flights) {
   const w = getWeights();
 
-  const prices = flights.map(f => f.price);
+  const prices    = flights.map(f => f.price);
   const durations = flights.map(f => f.duration);
   const qualities = flights.map(f => f.qualityScore);
 
-  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const minP = Math.min(...prices),    maxP = Math.max(...prices);
   const minD = Math.min(...durations), maxD = Math.max(...durations);
   const minQ = Math.min(...qualities), maxQ = Math.max(...qualities);
 
-  const avgP = prices.reduce((a,b)=>a+b,0)/prices.length;
-  const avgD = durations.reduce((a,b)=>a+b,0)/durations.length;
-  const avgQ = qualities.reduce((a,b)=>a+b,0)/qualities.length;
-
-  const stdP = Math.sqrt(prices.map(p=>(p-avgP)**2).reduce((a,b)=>a+b,0)/prices.length);
-  const stdD = Math.sqrt(durations.map(d=>(d-avgD)**2).reduce((a,b)=>a+b,0)/durations.length);
-  const stdQ = Math.sqrt(qualities.map(q=>(q-avgQ)**2).reduce((a,b)=>a+b,0)/qualities.length);
+  // Per-route price stats for anomaly detection
+  const routeGroups = {};
+  flights.forEach(f => {
+    const key = `${f.from}-${f.to}`;
+    (routeGroups[key] = routeGroups[key] || []).push(f.price);
+  });
+  const routeStats = {};
+  Object.entries(routeGroups).forEach(([key, ps]) => {
+    const avg = ps.reduce((a,b)=>a+b,0) / ps.length;
+    const std = Math.sqrt(ps.map(p=>(p-avg)**2).reduce((a,b)=>a+b,0) / ps.length);
+    routeStats[key] = { avg, std };
+  });
 
   return flights.map(f => {
-    const priceScore = maxP === minP ? 0.5 : (maxP - f.price) / (maxP - minP);
-    const timeScore = maxD === minD ? 0.5 : (maxD - f.duration) / (maxD - minD);
+    const priceScore   = maxP === minP ? 0.5 : (maxP - f.price)        / (maxP - minP);
+    const timeScore    = maxD === minD ? 0.5 : (maxD - f.duration)     / (maxD - minD);
     const qualityScore = maxQ === minQ ? 0.5 : (f.qualityScore - minQ) / (maxQ - minQ);
 
-    const stopPenalty = f.stops * 0.08;
+    const stopPenalty    = f.stops * 0.08;
     const compositeScore = (w.quality * qualityScore + w.price * priceScore + w.time * timeScore) - stopPenalty;
-    const totalScore = Math.max(0, Math.min(100, compositeScore * 100));
+    const totalScore     = Math.max(0, Math.min(100, compositeScore * 100));
 
-    const zPrice = stdP > 0 ? (f.price - avgP) / stdP : 0;
-    const zDuration = stdD > 0 ? (f.duration - avgD) / stdD : 0;
-    const zQuality = stdQ > 0 ? (f.qualityScore - avgQ) / stdQ : 0;
+    // Anomaly: price vs same route only, only cheap direction (z <= 0)
+    const { avg: rAvg, std: rStd } = routeStats[`${f.from}-${f.to}`] || { avg: f.price, std: 0 };
+    const zRoute = rStd > 0 ? (f.price - rAvg) / rStd : 0;
+    const saving = Math.round(rAvg - f.price);
 
-    const anomalyScore = Math.max(Math.abs(zPrice), Math.abs(zDuration), Math.abs(zQuality));
-
-    let anomalyType = 'normal';
-    let anomalyReason = '';
-
-    if (anomalyScore >= 2) {
-      anomalyType = 'high';
-      if (Math.abs(zPrice) >= 2) {
-        anomalyReason = f.price < avgP ? 'מחיר נמוך חריג — בדוק תנאים' : 'מחיר גבוה חריג';
-      } else if (Math.abs(zDuration) >= 2) {
-        anomalyReason = f.duration < avgD ? 'טיסה מהירה חריג' : 'טיסה ארוכה חריג';
-      } else {
-        anomalyReason = f.qualityScore < avgQ ? 'איכות נמוכה חריגה' : 'איכות גבוהה יוצאת דופן';
-      }
-    } else if (anomalyScore >= 1.5) {
-      anomalyType = 'medium';
-      anomalyReason = 'סטייה מהנורמה';
-    } else if (anomalyScore >= 1) {
-      anomalyType = 'low';
+    let anomalyType = 'normal', anomalyReason = '';
+    if (zRoute <= -4) {
+      anomalyType   = 'high';
+      anomalyReason = `מחיר נמוך בצורה חריגה מאוד — $${saving} מתחת לממוצע המסלול`;
+    } else if (zRoute <= -2.5) {
+      anomalyType   = 'medium';
+      anomalyReason = `מחיר נמוך חריג — $${saving} מתחת לממוצע המסלול`;
     }
 
     return {
       ...f,
-      priceScore: Math.round(priceScore * 100),
-      timeScore: Math.round(timeScore * 100),
+      priceScore:      Math.round(priceScore * 100),
+      timeScore:       Math.round(timeScore * 100),
       qualityScore_norm: Math.round(qualityScore * 100),
-      totalScore: Math.round(totalScore),
-      anomalyScore: Math.round(anomalyScore * 10) / 10,
+      totalScore:      Math.round(totalScore),
+      anomalyScore:    Math.round(-zRoute * 10) / 10,
       anomalyType,
       anomalyReason,
-      zPrice: Math.round(zPrice * 10) / 10,
-      zDuration: Math.round(zDuration * 10) / 10,
-      zQuality: Math.round(zQuality * 10) / 10,
+      zRoute:   Math.round(zRoute * 10) / 10,
+      routeAvg: Math.round(rAvg),
     };
   });
 }
 
 function filterFlights(flights) {
-  const date     = document.getElementById('f-date').value;
+  const date     = selectedDate;
   const origin   = document.getElementById('f-origin').value;
   const dest     = document.getElementById('f-dest').value;
   const airline  = document.getElementById('f-airline').value;
@@ -1758,6 +1875,9 @@ function renderFlights(flights) {
     const dealBadge = isDeal
       ? `<span class="deal-badge">⚡ חריגה${f.anomalyType === 'high' ? ' גבוהה' : ''}</span>`
       : '';
+    const timesHtml = f.depTime
+      ? `<span class="fb-times">${f.depTime}<span class="t-arr">→ ${f.arrTime}</span>${f.dayDiff > 0 ? `<span class="t-plus">+${f.dayDiff}</span>` : ''}</span><span class="fb-divider">·</span>`
+      : '';
 
     const block = document.createElement('div');
     block.className = `flight-block ${blockClass}`;
@@ -1773,6 +1893,7 @@ function renderFlights(flights) {
         <span class="fb-airline-badge">${f.airlineCode}</span>
         <span class="fb-airline">${f.airlineName}</span>
         <span class="fb-divider">·</span>
+        ${timesHtml}
         <span class="fb-meta">${f.stops === 0 ? 'ישיר' : f.stops + ' עצירות'} · ${formatDuration(f.duration)}</span>
         <div class="fb-spacer"></div>
         ${dealBadge}
@@ -1888,24 +2009,128 @@ async function loadFlightsJSON() {
 function enrichFlight(f) {
   const airlineCode = resolveAirlineCode(f.airlineName);
   const airline = AIRLINES_DATA[airlineCode] || { name: f.airlineName, quality_score: 7, is_low_cost: false };
-  const hour = f.departureTime ? new Date(f.departureTime).getHours() : 8;
+
+  let depDt = null;
+  if (f.departureTime) {
+    depDt = new Date(f.departureTime);
+  } else if (f.date) {
+    const h = f.departureHour ?? 8;
+    depDt = new Date(`${f.date}T${String(h).padStart(2,'0')}:00:00`);
+  }
+
+  const fmtTime = dt => `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
+  const validDep = depDt && !isNaN(depDt.getTime());
+
+  let depTime = null, arrTime = null, dayDiff = 0;
+  if (validDep && f.duration) {
+    const arrDt = new Date(depDt.getTime() + f.duration * 60000);
+    depTime = fmtTime(depDt);
+    arrTime = fmtTime(arrDt);
+    const d1 = new Date(depDt.getFullYear(), depDt.getMonth(), depDt.getDate());
+    const d2 = new Date(arrDt.getFullYear(), arrDt.getMonth(), arrDt.getDate());
+    dayDiff = Math.round((d2 - d1) / 86400000);
+  }
+
   return {
     ...f,
-    fromCity:     AIRPORTS[f.from]?.city || f.from,
-    toCity:       AIRPORTS[f.to]?.city   || f.to,
+    fromCity:      AIRPORTS[f.from]?.city || f.from,
+    toCity:        AIRPORTS[f.to]?.city   || f.to,
     airlineCode,
-    airlineName:  f.airlineName || airline.name,
-    qualityScore: airline.quality_score,
-    isLowCost:    airline.is_low_cost,
-    departureHour: isNaN(hour) ? 8 : hour,
+    airlineName:   f.airlineName || airline.name,
+    qualityScore:  airline.quality_score,
+    isLowCost:     airline.is_low_cost,
+    departureHour: validDep ? depDt.getHours() : (f.departureHour ?? 8),
+    depTime,
+    arrTime,
+    dayDiff,
   };
 }
 
+function formatDateHe(d) {
+  const dt = new Date(d + 'T12:00:00');
+  return dt.toLocaleDateString('he-IL', { weekday: 'short', day: 'numeric', month: 'long' });
+}
+
 function populateDatePicker(dates) {
-  availableDates = dates;
-  const el = document.getElementById('f-date');
-  el.innerHTML = dates.map(d => `<option value="${d}">${d}</option>`).join('');
-  el.value = dates[0] || '';
+  availableDates = [...new Set(dates)].sort();
+  if (availableDates.length > 0) {
+    calViewDate = new Date(availableDates[0] + 'T12:00:00');
+  }
+  renderCalendar();
+}
+
+const CAL_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const CAL_DAYS   = ['א','ב','ג','ד','ה','ו','ש'];
+
+function renderCalendar() {
+  const year  = calViewDate.getFullYear();
+  const month = calViewDate.getMonth();
+
+  document.getElementById('cal-month-label').textContent = `${CAL_MONTHS[month]} ${year}`;
+
+  const grid = document.getElementById('cal-grid');
+  grid.innerHTML = '';
+
+  CAL_DAYS.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDow = new Date(year, month, 1).getDay();
+  for (let i = 0; i < firstDow; i++) {
+    grid.appendChild(Object.assign(document.createElement('div'), { className: 'cal-day' }));
+  }
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const todayStr    = new Date().toISOString().slice(0, 10);
+  const availSet    = new Set(availableDates);
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const el = document.createElement('div');
+    el.className = 'cal-day';
+    el.textContent = d;
+    if (availSet.has(ds)) {
+      el.classList.add('has-flights');
+      el.onclick = () => calSelectDate(ds);
+    }
+    if (ds === selectedDate) el.classList.add('selected');
+    if (ds === todayStr)    el.classList.add('today');
+    grid.appendChild(el);
+  }
+
+  const btn = document.getElementById('cal-clear-btn');
+  if (selectedDate) {
+    btn.textContent = `✕ נקה — ${formatDateHe(selectedDate)}`;
+    btn.classList.remove('all-active');
+  } else {
+    btn.textContent = 'כל התאריכים';
+    btn.classList.add('all-active');
+  }
+}
+
+function calSelectDate(d) {
+  selectedDate = (selectedDate === d) ? '' : d;
+  renderCalendar();
+  rerankAndDisplay();
+}
+
+function calClearDate() {
+  selectedDate = '';
+  renderCalendar();
+  rerankAndDisplay();
+}
+
+function calPrevMonth() {
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() - 1, 1);
+  renderCalendar();
+}
+
+function calNextMonth() {
+  calViewDate = new Date(calViewDate.getFullYear(), calViewDate.getMonth() + 1, 1);
+  renderCalendar();
 }
 
 async function searchFlights() {
@@ -1924,9 +2149,8 @@ async function searchFlights() {
       populateDatePicker(data.dates);
     }
 
-    const selectedDate = document.getElementById('f-date').value;
-    const raw = data.flights.filter(f => !selectedDate || f.date === selectedDate);
-    allFlights = raw.map(enrichFlight);
+    // Load ALL flights — date filtering is handled client-side by filterFlights()
+    allFlights = data.flights.map(enrichFlight);
 
     document.getElementById('api-status').textContent =
       `✓ נתונים מ-${data.fetched_at?.slice(0,10) || '?'} · ${allFlights.length} טיסות`;
@@ -1986,7 +2210,7 @@ function populateFilters(flights) {
     airlineSel.innerHTML += `<option value="${code}">${al ? al.name : code}</option>`;
   });
 
-  ['f-date','f-origin','f-dest','f-airline','f-stops','f-maxprice'].forEach(id => {
+  ['f-origin','f-dest','f-airline','f-stops','f-maxprice'].forEach(id => {
     const el = document.getElementById(id);
     el.onchange = () => rerankAndDisplay();
     el.oninput = () => rerankAndDisplay();
@@ -2070,19 +2294,14 @@ function showFlightDetail(f, rank) {
       </div>
       <div class="anomaly-bars">
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">סטיית מחיר</span>
-          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zPrice)*33)}%;background:${f.zPrice > 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
-          <span class="anomaly-bar-sigma" style="color:${f.zPrice > 0 ? 'var(--red)' : 'var(--green)'}">${f.zPrice > 0 ? '+' : ''}${f.zPrice}σ</span>
+          <span class="anomaly-bar-label">סטייה מממוצע מסלול</span>
+          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100, Math.abs(f.zRoute) * 25)}%;background:var(--green)"></div></div>
+          <span class="anomaly-bar-sigma" style="color:var(--green)">${f.zRoute}σ</span>
         </div>
         <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">סטיית זמן</span>
-          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zDuration)*33)}%;background:${f.zDuration > 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
-          <span class="anomaly-bar-sigma" style="color:${f.zDuration > 0 ? 'var(--red)' : 'var(--green)'}">${f.zDuration > 0 ? '+' : ''}${f.zDuration}σ</span>
-        </div>
-        <div class="anomaly-bar-row">
-          <span class="anomaly-bar-label">סטיית איכות</span>
-          <div class="anomaly-bar-track"><div class="anomaly-bar-fill" style="width:${Math.min(100,Math.abs(f.zQuality)*33)}%;background:${f.zQuality < 0 ? 'var(--red)' : 'var(--green)'}"></div></div>
-          <span class="anomaly-bar-sigma" style="color:${f.zQuality < 0 ? 'var(--red)' : 'var(--green)'}">${f.zQuality > 0 ? '+' : ''}${f.zQuality}σ</span>
+          <span class="anomaly-bar-label">ממוצע מסלול</span>
+          <div class="anomaly-bar-track" style="background:transparent"></div>
+          <span class="anomaly-bar-sigma" style="color:var(--text2);font-size:12px;">$${f.routeAvg}</span>
         </div>
       </div>
     </div>
