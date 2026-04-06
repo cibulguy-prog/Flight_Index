@@ -1772,11 +1772,14 @@ function computeScores(flights) {
 
   return flights.map(f => {
     const priceScore   = maxP === minP ? 0.5 : (maxP - f.price)        / (maxP - minP);
-    const timeScore    = maxD === minD ? 0.5 : (maxD - f.duration)     / (maxD - minD);
+    const rawTimeScore = maxD === minD ? 0.5 : (maxD - f.duration)     / (maxD - minD);
     const qualityScore = maxQ === minQ ? 0.5 : (f.qualityScore - minQ) / (maxQ - minQ);
 
-    const stopPenalty    = f.stops * 0.08;
-    const compositeScore = (w.quality * qualityScore + w.price * priceScore + w.time * timeScore) - stopPenalty;
+    // Stop penalty embedded in time score — each stop penalizes journey experience
+    const timeScore    = Math.max(0, rawTimeScore - f.stops * 0.12);
+
+    // Total = true weighted average of the three displayed scores
+    const compositeScore = w.quality * qualityScore + w.price * priceScore + w.time * timeScore;
     const totalScore     = Math.max(0, Math.min(100, compositeScore * 100));
 
     // Anomaly: price vs same route only, only cheap direction (z <= 0)
