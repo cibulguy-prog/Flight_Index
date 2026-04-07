@@ -19,40 +19,43 @@
 
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈</text></svg>">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap');
 
   :root {
-    --bg: #0c0d18;
-    --surface: #141628;
-    --surface2: #1d2038;
-    --surface3: #262a42;
-    --border: rgba(255,255,255,0.07);
-    --border2: rgba(255,255,255,0.14);
-    --text: #eef0f8;
-    --text2: #8d95b0;
-    --text3: #525c78;
-    --accent: #5a85ff;
-    --accent2: #8466ff;
-    --green: #2de0b0;
-    --amber: #f5a623;
-    --red: #ff6060;
-    --purple: #b39eff;
-    --cyan: #2adaf5;
-    --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
-    --shadow-md: 0 4px 20px rgba(0,0,0,0.45);
-    --shadow-lg: 0 12px 40px rgba(0,0,0,0.55);
-
+    --bg: #07101f;
+    --surface: #0d1829;
+    --surface2: #132034;
+    --surface3: #1b2c45;
+    --border: rgba(148,180,255,0.08);
+    --border2: rgba(148,180,255,0.16);
+    --text: #eef2ff;
+    --text2: #7d9ab8;
+    --text3: #3d5570;
+    --accent: #3b82f6;
+    --accent2: #6366f1;
+    --green: #10d9a0;
+    --amber: #f59e0b;
+    --red: #ef4444;
+    --purple: #a78bfa;
+    --cyan: #06b6d4;
+    --shadow-sm: 0 2px 12px rgba(0,0,0,0.4);
+    --shadow-md: 0 6px 28px rgba(0,0,0,0.5);
+    --shadow-lg: 0 20px 60px rgba(0,0,0,0.65);
+    --radius: 16px;
+    --radius-sm: 10px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Heebo', sans-serif;
-    background: radial-gradient(ellipse at 25% 0%, rgba(90,133,255,0.05) 0%, transparent 55%),
-                radial-gradient(ellipse at 75% 100%, rgba(132,102,255,0.04) 0%, transparent 50%),
-                var(--bg);
+    font-family: 'Inter', sans-serif;
+    background:
+      radial-gradient(ellipse at 15% 0%, rgba(59,130,246,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 85% 80%, rgba(99,102,241,0.08) 0%, transparent 50%),
+      var(--bg);
     color: var(--text);
     min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
   }
 
   /* HEADER */
@@ -64,7 +67,7 @@
     justify-content: space-between;
     position: sticky;
     top: 0;
-    background: rgba(12,13,24,0.94);
+    background: rgba(7,16,31,0.92);
     backdrop-filter: blur(20px);
     z-index: 100;
   }
@@ -87,7 +90,7 @@
   }
 
   .logo-text {
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 17px;
     font-weight: 700;
     letter-spacing: -0.3px;
@@ -100,7 +103,7 @@
   .logo-sub {
     font-size: 11px;
     color: var(--text3);
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     letter-spacing: 0.5px;
   }
 
@@ -144,6 +147,9 @@
     max-height: calc(100vh - 73px);
     position: sticky;
     top: 73px;
+    background: rgba(13,24,41,0.8);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   .sidebar-section {
@@ -156,7 +162,7 @@
     text-transform: uppercase;
     color: var(--text2);
     margin-bottom: 14px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -241,7 +247,7 @@
     padding: 8px 12px;
     color: var(--text);
     font-size: 13px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     outline: none;
     transition: border-color 0.15s;
   }
@@ -310,7 +316,7 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
     box-shadow: 0 4px 18px rgba(90,133,255,0.3);
     letter-spacing: 0.3px;
@@ -360,7 +366,7 @@
     transition: all 0.15s;
     border: none;
     background: none;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
   .sort-tab.active {
@@ -390,7 +396,7 @@
     color: var(--text3);
     letter-spacing: 0.3px;
     margin-bottom: 6px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 500;
     text-transform: uppercase;
   }
@@ -607,7 +613,7 @@
     padding: 3px 10px;
     border-radius: 12px;
     font-size: 10px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-weight: 600;
     letter-spacing: 0.3px;
   }
@@ -666,7 +672,7 @@
   .loading-text {
     font-size: 13px;
     color: var(--text3);
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
 
   /* EMPTY STATE */
@@ -928,6 +934,13 @@
     gap: 4px;
   }
   .fb-times .t-arr { color: var(--text2); }
+  .fb-date {
+    font-size: 12px;
+    color: var(--text2);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
   .fb-times .t-plus {
     font-size: 9px;
     color: var(--amber);
@@ -947,7 +960,7 @@
     border: 1px solid rgba(245,166,35,0.35);
     border-radius: 20px;
     font-size: 11px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     color: var(--amber);
     font-weight: 700;
     white-space: nowrap;
@@ -1062,7 +1075,7 @@
     font-size: 9px;
     color: var(--text3);
     margin-top: 4px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   .stat-card.filter-active .s-filter-hint { color: var(--amber); }
 
@@ -1130,9 +1143,8 @@
     .main-content { padding: 16px; }
     .stats-bar { grid-template-columns: repeat(2, 1fr); }
     .fb-top { flex-wrap: wrap; gap: 6px; padding: 10px 12px 8px; }
-    .fb-thead, .fb-tbody { grid-template-columns: repeat(2, 1fr); }
-    .fb-th:nth-child(3), .fb-th:nth-child(4),
-    .fb-td:nth-child(3), .fb-td:nth-child(4) { display: none; }
+    .fb-thead, .fb-tbody { grid-template-columns: repeat(3, 1fr); }
+    .fb-th:nth-child(3), .fb-td:nth-child(3) { display: none; }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
@@ -1212,15 +1224,239 @@
     padding: 6px; background: var(--surface2);
     border: 1px solid var(--border); border-radius: 7px;
     color: var(--text2); font-size: 11px;
-    font-family: 'Heebo', sans-serif;
+    font-family: 'Inter', sans-serif;
     cursor: pointer; transition: background 0.15s;
     text-align: center;
   }
   .cal-clear-btn:hover { background: var(--surface3); color: var(--text); }
   .cal-clear-btn.all-active {
-    background: rgba(79,124,255,0.1);
-    border-color: rgba(79,124,255,0.3);
+    background: rgba(59,130,246,0.12);
+    border-color: rgba(59,130,246,0.3);
     color: var(--accent);
+  }
+
+  /* ── PREMIUM FLIGHT CARD ────────────────────────────── */
+  .flight-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: transform 0.2s cubic-bezier(0.4,0,0.2,1), box-shadow 0.2s, border-color 0.2s, background 0.2s;
+    box-shadow: var(--shadow-sm);
+  }
+  .flight-block:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border2);
+    background: var(--surface2);
+  }
+  .flight-block.rank-1 { border-left-color: #f59e0b; box-shadow: 0 2px 16px rgba(245,158,11,0.12); }
+  .flight-block.rank-2 { border-left-color: #94a3b8; }
+  .flight-block.rank-3 { border-left-color: #cd7f32; }
+  .flight-block.is-deal { border-left-color: var(--amber); background: rgba(245,158,11,0.04); }
+
+  /* Card header: route + score ring */
+  .fc-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 12px;
+  }
+  .fc-rank {
+    font-family: 'Space Mono', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 32px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .fc-route {
+    flex: 1;
+    min-width: 0;
+  }
+  .fc-iata-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .fc-arrow { color: var(--text3); font-size: 14px; }
+  .fc-cities-label {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 2px;
+    font-weight: 400;
+  }
+
+  /* Score ring */
+  .fc-score-ring {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+  }
+  .fc-score-ring svg { position: absolute; inset: 0; }
+  .fc-score-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .fc-score-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 15px;
+    font-weight: 700;
+  }
+  .fc-score-lbl {
+    font-size: 8px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  /* Airline + times row */
+  .fc-info-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px 12px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--text2);
+  }
+  .fc-airline-code {
+    padding: 2px 7px;
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--text2);
+    flex-shrink: 0;
+  }
+  .fc-airline-name { font-weight: 500; color: var(--text); flex-shrink: 0; }
+  .fc-dot { color: var(--text3); }
+  .fc-times {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .fc-times .t-arr { color: var(--text2); font-weight: 400; }
+  .fc-times .t-plus { font-size: 9px; color: var(--amber); vertical-align: super; }
+  .fc-date-label { color: var(--text2); font-weight: 500; }
+
+  /* Metrics row */
+  .fc-metrics {
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+  .fc-metric {
+    flex: 1;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .fc-metric-sep {
+    width: 1px;
+    background: var(--border);
+    margin: 10px 0;
+    flex-shrink: 0;
+  }
+  .fc-metric-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .fc-metric-unit { font-size: 11px; font-weight: 400; opacity: 0.55; }
+  .fc-metric-track {
+    height: 3px;
+    background: var(--surface3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .fc-metric-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .fc-metric-label {
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+
+  /* Value Insight badge */
+  .fc-insight {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    border-left: 1px solid var(--border);
+    flex-shrink: 0;
+    max-width: 200px;
+  }
+  .fc-insight-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
+  .fc-insight-title {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text3);
+    margin-bottom: 2px;
+    font-weight: 600;
+  }
+  .fc-insight-body {
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .fc-insight.high { background: rgba(239,68,68,0.06); }
+  .fc-insight.high .fc-insight-body { color: var(--red); }
+  .fc-insight.medium { background: rgba(245,158,11,0.06); }
+  .fc-insight.medium .fc-insight-body { color: var(--amber); }
+
+  /* Deal badge upgrade */
+  .deal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(245,158,11,0.1));
+    border: 1px solid rgba(245,158,11,0.4);
+    border-radius: 20px;
+    font-size: 11px;
+    font-family: 'Inter', sans-serif;
+    color: var(--amber);
+    font-weight: 700;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+
+  @media (max-width: 768px) {
+    .fc-insight { display: none; }
+    .fc-metrics { flex-wrap: nowrap; }
   }
 </style>
 </head>
@@ -1559,7 +1795,8 @@ function getWeights() {
   const q = +document.getElementById('w-quality').value;
   const p = +document.getElementById('w-price').value;
   const t = +document.getElementById('w-time').value;
-  return { quality: q/100, price: p/100, time: t/100, total: q+p+t };
+  const sum = q + p + t || 100;
+  return { quality: q/sum, price: p/sum, time: t/sum, total: q+p+t };
 }
 
 const WEIGHT_DEFAULTS = { quality: 40, price: 35, time: 25 };
@@ -1609,12 +1846,17 @@ SLIDER_IDS.forEach(changedId => {
         : Math.floor(remaining / 2))
     );
 
-    // Fix rounding drift so total === 100
+    // Fix any rounding/floor drift — force exact sum of 100
     let diff = 100 - newVal - newVals.reduce((s, v) => s + v, 0);
-    for (let i = 0; i < newVals.length && diff !== 0; i++) {
-      if (diff > 0) { newVals[i]++; diff--; }
-      else if (newVals[i] > SLIDER_MIN) { newVals[i]--; diff++; }
+    // Try to fix by adjusting sliders that have room
+    for (let pass = 0; pass < 10 && diff !== 0; pass++) {
+      for (let i = 0; i < newVals.length && diff !== 0; i++) {
+        if (diff > 0) { newVals[i]++; diff--; }
+        else if (newVals[i] > SLIDER_MIN) { newVals[i]--; diff++; }
+      }
     }
+    // Last resort: force the first slider to make total exactly 100
+    if (diff !== 0) newVals[0] = Math.max(SLIDER_MIN, newVals[0] + diff);
 
     otherEls.forEach((el, i) => { el.value = newVals[i]; });
     updateWeightDisplay();
@@ -1855,6 +2097,7 @@ function computeScores(flights) {
       qualityScore_norm: Math.round(qualityScore * 100),
       totalScore:      Math.round(totalScore),
       anomalyScore:    Math.round(-zRoute * 10) / 10,
+      anomalySaving:   saving > 0 ? saving : 0,
       anomalyType,
       anomalyReason,
       zRoute:   Math.round(zRoute * 10) / 10,
@@ -1891,6 +2134,27 @@ function sortFlights(flights) {
     if (sortMode === 'anomaly') return b.anomalyScore - a.anomalyScore;
     return 0;
   });
+}
+
+function scoreCircle(score, cls) {
+  const r = 22, circ = +(2 * Math.PI * r).toFixed(2);
+  const fill = +((score / 100) * circ).toFixed(2);
+  const colors = { excellent: '#10d9a0', good: '#06b6d4', medium: '#f59e0b', low: '#ef4444' };
+  const color = colors[cls] || '#10d9a0';
+  return `<div class="fc-score-ring">
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle cx="30" cy="30" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4.5"
+        transform="rotate(-90 30 30)"/>
+      <circle cx="30" cy="30" r="${r}" fill="none" stroke="${color}" stroke-width="4.5"
+        stroke-dasharray="${fill} ${circ}" stroke-linecap="round"
+        transform="rotate(-90 30 30)"
+        style="transition:stroke-dasharray 0.7s cubic-bezier(0.4,0,0.2,1)"/>
+    </svg>
+    <div class="fc-score-center">
+      <div class="fc-score-num" style="color:${color}">${score}</div>
+      <div class="fc-score-lbl">score</div>
+    </div>
+  </div>`;
 }
 
 function formatDuration(mins) {
@@ -1930,6 +2194,9 @@ function renderFlights(flights) {
     const dealBadge = isDeal
       ? `<span class="deal-badge">⚡ ${f.anomalyType === 'high' ? 'Hot Deal' : 'Deal'}</span>`
       : '';
+    const dateLabel = f.date
+      ? new Date(f.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      : '';
     const timesHtml = f.depTime
       ? `<span class="fb-times">${f.depTime}<span class="t-arr">→ ${f.arrTime}</span>${f.dayDiff > 0 ? `<span class="t-plus">+${f.dayDiff}</span>` : ''}</span><span class="fb-divider">·</span>`
       : '';
@@ -1938,59 +2205,65 @@ function renderFlights(flights) {
     block.className = `flight-block ${blockClass}`;
     block.onclick = () => showFlightDetail(f, i+1);
 
+    const stopsLabel = f.stops === 0 ? 'Direct' : f.stops === 1 ? '1 stop' : `${f.stops} stops`;
+    const timesRow = f.depTime
+      ? `<span class="fc-times">${f.depTime}<span class="t-arr"> → ${f.arrTime}</span>${f.dayDiff > 0 ? `<span class="t-plus">+${f.dayDiff}</span>` : ''}</span><span class="fc-dot">·</span>`
+      : '';
+    const insightHtml = (f.anomalyType && f.anomalyType !== 'normal' && f.anomalyScore > 0)
+      ? `<div class="fc-insight ${f.anomalyType}">
+          <div class="fc-insight-icon">${f.anomalyType === 'high' ? '🔥' : '✦'}</div>
+          <div>
+            <div class="fc-insight-title">Price Insight</div>
+            <div class="fc-insight-body">${f.anomalyScore}σ below avg · Save $${f.anomalySaving}</div>
+          </div>
+        </div>`
+      : '';
+
     block.innerHTML = `
-      <!-- Row 1: flight identity -->
-      <div class="fb-top">
-        <div class="fb-rank" style="font-size:${i<3?'18':'13'}px;color:${rankColor}">${rankMark}</div>
-        <span class="fb-iata">${f.from}<span class="arr">→</span>${f.to}</span>
-        <span class="fb-cities">${f.fromCity} → ${f.toCity}</span>
-        <span class="fb-divider">·</span>
-        <span class="fb-airline-badge">${f.airlineCode}</span>
-        <span class="fb-airline">${f.airlineName}</span>
-        <span class="fb-divider">·</span>
-        ${timesHtml}
-        <span class="fb-meta">${f.stops === 0 ? 'Direct' : f.stops + (f.stops === 1 ? ' stop' : ' stops')} · ${formatDuration(f.duration)}</span>
-        <div class="fb-spacer"></div>
+      <!-- Header: rank + route + score ring -->
+      <div class="fc-head">
+        <div class="fc-rank" style="font-size:${i<3?'20':'13'}px;color:${rankColor}">${rankMark}</div>
+        <div class="fc-route">
+          <div class="fc-iata-row">
+            <span>${f.from}</span><span class="fc-arrow">→</span><span>${f.to}</span>
+          </div>
+          <div class="fc-cities-label">${f.fromCity} → ${f.toCity}</div>
+        </div>
+        <div style="flex:1"></div>
         ${dealBadge}
+        ${scoreCircle(f.totalScore, sc)}
       </div>
 
-      <!-- Metrics table: row 1 = headers, row 2 = values -->
-      <div class="fb-table">
-        <div class="fb-thead">
-          <div class="fb-th">Price</div>
-          <div class="fb-th">Quality Rating</div>
-          <div class="fb-th">Flight Time</div>
-          <div class="fb-th">Total Score</div>
+      <!-- Airline + times -->
+      <div class="fc-info-row">
+        <span class="fc-airline-code">${f.airlineCode}</span>
+        <span class="fc-airline-name">${f.airlineName}</span>
+        <span class="fc-dot">·</span>
+        ${timesRow}
+        <span>${stopsLabel} · ${formatDuration(f.duration)}</span>
+        ${dateLabel ? `<span class="fc-dot">·</span><span class="fc-date-label">${dateLabel}</span>` : ''}
+      </div>
+
+      <!-- Metrics -->
+      <div class="fc-metrics">
+        <div class="fc-metric">
+          <div class="fc-metric-val" style="color:var(--green)">$${f.price}</div>
+          <div class="fc-metric-track"><div class="fc-metric-fill" style="width:${f.priceScore}%;background:linear-gradient(90deg,#059669,var(--green))"></div></div>
+          <div class="fc-metric-label">Price · ${f.priceScore}/100</div>
         </div>
-        <div class="fb-tbody">
-          <div class="fb-td">
-            <div class="td-val" style="color:var(--green)">$${f.price}</div>
-            <div class="td-bar-wrap">
-              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.priceScore}%;background:var(--green)"></div></div>
-              <div class="td-sub">Score ${f.priceScore}/100</div>
-            </div>
-          </div>
-          <div class="fb-td">
-            <div class="td-val" style="color:var(--purple)">${f.qualityScore}<span style="font-size:12px;font-weight:400;opacity:0.5">/10</span></div>
-            <div class="td-bar-wrap">
-              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.qualityScore * 10}%;background:var(--purple)"></div></div>
-              <div class="td-sub">${f.airlineName}</div>
-            </div>
-          </div>
-          <div class="fb-td">
-            <div class="td-val" style="color:var(--cyan)">${Math.floor(f.duration/60)}h ${f.duration%60}m</div>
-            <div class="td-bar-wrap">
-              <div class="td-bar-track"><div class="td-bar-fill" style="width:${f.timeScore}%;background:var(--cyan)"></div></div>
-              <div class="td-sub">${f.stops === 0 ? 'Direct' : f.stops === 1 ? '1 stop' : f.stops + ' stops'}</div>
-            </div>
-          </div>
-          <div class="fb-td">
-            <div class="score-pill ${sc}">
-              <div class="sp-num">${f.totalScore}</div>
-              <div class="sp-label">score</div>
-            </div>
-          </div>
+        <div class="fc-metric-sep"></div>
+        <div class="fc-metric">
+          <div class="fc-metric-val" style="color:var(--purple)">${f.qualityScore}<span class="fc-metric-unit">/10</span></div>
+          <div class="fc-metric-track"><div class="fc-metric-fill" style="width:${f.qualityScore*10}%;background:linear-gradient(90deg,#7c3aed,var(--purple))"></div></div>
+          <div class="fc-metric-label">Skytrax Rating</div>
         </div>
+        <div class="fc-metric-sep"></div>
+        <div class="fc-metric">
+          <div class="fc-metric-val" style="color:var(--cyan)">${Math.floor(f.duration/60)}h ${f.duration%60}m</div>
+          <div class="fc-metric-track"><div class="fc-metric-fill" style="width:${f.timeScore}%;background:linear-gradient(90deg,#0284c7,var(--cyan))"></div></div>
+          <div class="fc-metric-label">Duration · ${f.timeScore}/100</div>
+        </div>
+        ${insightHtml}
       </div>
     `;
 
@@ -2063,27 +2336,34 @@ async function loadFlightsJSON() {
 
 function enrichFlight(f) {
   const airlineCode = resolveAirlineCode(f.airlineName);
-  const airline = AIRLINES_DATA[airlineCode] || { name: f.airlineName, quality_score: 7, is_low_cost: false };
+  const airline = AIRLINES_DATA[airlineCode] || { name: f.airlineName, quality_score: 4.5, is_low_cost: true };
 
-  let depDt = null;
+  let depTime = null, arrTime = null, dayDiff = 0, depHour = f.departureHour ?? 8;
+
+  const calcArr = (depH, depM, duration) => {
+    const totalArrMin = depH * 60 + depM + duration;
+    const arrH = Math.floor(totalArrMin % (24 * 60) / 60);
+    const arrM = totalArrMin % 60;
+    return {
+      arrTime: `${String(arrH).padStart(2,'0')}:${String(arrM).padStart(2,'0')}`,
+      dayDiff: Math.floor(totalArrMin / (24 * 60))
+    };
+  };
+
   if (f.departureTime) {
-    depDt = new Date(f.departureTime);
+    // Parse directly from string — avoids browser timezone conversion
+    const m = f.departureTime.match(/T(\d{2}):(\d{2})/);
+    if (m) {
+      const depH = parseInt(m[1]), depM = parseInt(m[2]);
+      depHour = depH;
+      depTime = `${m[1]}:${m[2]}`;
+      if (f.duration) ({ arrTime, dayDiff } = calcArr(depH, depM, f.duration));
+    }
   } else if (f.date) {
     const h = f.departureHour ?? 8;
-    depDt = new Date(`${f.date}T${String(h).padStart(2,'0')}:00:00`);
-  }
-
-  const fmtTime = dt => `${String(dt.getHours()).padStart(2,'0')}:${String(dt.getMinutes()).padStart(2,'0')}`;
-  const validDep = depDt && !isNaN(depDt.getTime());
-
-  let depTime = null, arrTime = null, dayDiff = 0;
-  if (validDep && f.duration) {
-    const arrDt = new Date(depDt.getTime() + f.duration * 60000);
-    depTime = fmtTime(depDt);
-    arrTime = fmtTime(arrDt);
-    const d1 = new Date(depDt.getFullYear(), depDt.getMonth(), depDt.getDate());
-    const d2 = new Date(arrDt.getFullYear(), arrDt.getMonth(), arrDt.getDate());
-    dayDiff = Math.round((d2 - d1) / 86400000);
+    depHour = h;
+    depTime = `${String(h).padStart(2,'0')}:00`;
+    if (f.duration) ({ arrTime, dayDiff } = calcArr(h, 0, f.duration));
   }
 
   return {
@@ -2094,7 +2374,7 @@ function enrichFlight(f) {
     airlineName:   f.airlineName || airline.name,
     qualityScore:  airline.quality_score,
     isLowCost:     airline.is_low_cost,
-    departureHour: validDep ? depDt.getHours() : (f.departureHour ?? 8),
+    departureHour: depHour,
     depTime,
     arrTime,
     dayDiff,
